@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,13 +24,13 @@ import java.util.HashMap;
 public class FileUtils {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
-    public static String wordOne = "a";
-    public static String wordTwo = "chalcophile";
-    public static String wordThree = "empeigne";
-    public static String wordFour = "infanterie";
-    public static String wordFive = "ottonienne";
-    public static String wordSix = "runique";
-    public static HashMap<String, Integer> hashFiles = new HashMap<String, Integer>() {{
+    private static String wordOne = "a";
+    private static String wordTwo = "chalcophile";
+    private static String wordThree = "empeigne";
+    private static String wordFour = "infanterie";
+    private static String wordFive = "ottonienne";
+    private static String wordSix = "runique";
+    private static HashMap<String, Integer> hashFiles = new HashMap<String, Integer>() {{
         put(wordOne, R.raw.file1);
         put(wordTwo, R.raw.file2);
         put(wordThree, R.raw.file3);
@@ -59,7 +60,7 @@ public class FileUtils {
         return Integer.parseInt(null);
     }
 
-    public static void writeToFile(File filePath, String wordToAdd) {
+    static void writeToFile(File filePath, String wordToAdd) {
         File file = new File(filePath, filename);
         try {
             FileWriter writer = new FileWriter(file, true);
@@ -73,8 +74,8 @@ public class FileUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static boolean needsSave(Context context, String wordToAdd) {
-        FileInputStream fis = null;
+    static boolean needsSave(Context context, String wordToAdd) {
+        FileInputStream fis;
         try {
             fis = context.openFileInput(filename);
         } catch (FileNotFoundException e) {
@@ -99,7 +100,30 @@ public class FileUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static void removeFromFile(File filePath, String wordToRemove) {
+    static ArrayList<String> retrieveSuggestions(Context context, String wordToComplete) {
+        ArrayList<String> suggestions = new ArrayList<>();
+        int matchNumbers = 0;
+        InputStream is = context.getResources().openRawResource(R.raw.dico);
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try {
+            while (reader.ready()) {
+                String currentLine = reader.readLine();
+                if (currentLine.startsWith(wordToComplete) && matchNumbers <  MainActivity.suggestionNumbers) {
+                    matchNumbers++;
+                    suggestions.add(currentLine);
+                } else if (matchNumbers >= MainActivity.suggestionNumbers) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+        return suggestions;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void removeFromFile(File filePath, String wordToRemove) {
 
         File savedWordsFile = new File(filePath, filename);
         File tempFile = new File(filePath, tempfilename);
@@ -129,11 +153,11 @@ public class FileUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static ArrayList<SpannableString> retrieveSavedWords(Context context) {
+    static ArrayList<SpannableString> retrieveSavedWords(Context context) {
         ArrayList<SpannableString> savedWordslist = new ArrayList<>();
         ArrayList<String> savedWordsString = new ArrayList<>();
 
-        FileInputStream fis = null;
+        FileInputStream fis;
         try {
             fis = context.openFileInput(filename);
         } catch (FileNotFoundException e) {

@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,39 +43,29 @@ public class SearchResultsActivity extends AppCompatActivity {
     private Menu searchResultsMenu;
     private boolean needsSave;
 
-    public static CharSequence trimTrailingWhitespace(CharSequence source) {
-        if(source == null)
-            return "";
-        int i = source.length();
 
-        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
-        }
-        return source.subSequence(0, i+1);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchable_activity);
-       // TextView textView = findViewById(R.id.textviewsearch);
         ListView listView = findViewById(R.id.view_list);
         ArrayList<SpannableString> definition = handleIntent(getIntent());
-        ArrayAdapter adapter = new ArrayAdapter<SpannableString>(this,
+        ArrayAdapter adapter = new ArrayAdapter<>(this,
                 R.layout.textview, definition);
         setSearchedWord("");
         if (getIntent() != null) {
             setTitle(getIntent().getStringExtra(SearchManager.QUERY));
             setSearchedWord(getIntent().getStringExtra(SearchManager.QUERY));
         }
-        //textView.setText(definition);
         listView.setAdapter(adapter);
         Toolbar toolbar = findViewById(R.id.toolbar);
-
-        toolbar.setNavigationIcon(R.drawable.ic_back);
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_back);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(false);
+        }
     }
 
     private String getSearchedWord() {
@@ -99,16 +88,16 @@ public class SearchResultsActivity extends AppCompatActivity {
         final MenuItem searchMenuItem = menu.findItem(R.id.search);
         final SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
-        SearchableInfo searchinfo = searchManager.getSearchableInfo(getComponentName());
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-
+        if (searchManager != null) {
+            SearchableInfo searchinfo = searchManager.getSearchableInfo(getComponentName());
+            searchView.setSearchableInfo(
+                    searchManager.getSearchableInfo(getComponentName()));
+        }
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchView.setQuery("",false);
-                searchView.setIconified(true);
+                DisplayUtils.hideSearchBar(searchView);
                 return false;
             }
 
@@ -132,7 +121,6 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     private void setIconAlpha(Menu menu, boolean needsSave) {
-        MenuItem item = menu.findItem(R.id.action_save);
         Drawable resIcon = getResources().getDrawable(R.drawable.ic_save);
         if (needsSave) {
             resIcon.setAlpha(255);
@@ -177,7 +165,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void removeWordFromSavedList(File filesDir) {
         String wordToRemove = getSearchedWord();
         FileUtils.removeFromFile(filesDir, wordToRemove);
-        displayToast(wordUnsaved);
+        DisplayUtils.displayToast(getApplicationContext(), wordUnsaved);
         setNeedsSave(true);
         setIconAlpha(getSearchResultsMenu(), true);
     }
@@ -185,16 +173,9 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void addWordToSavedList(File filesDir, String wordToSave) {
         FileUtils.writeToFile(filesDir, wordToSave);
-        displayToast(wordSaved);
+        DisplayUtils.displayToast(getApplicationContext(),wordSaved);
         setNeedsSave(false);
         setIconAlpha(getSearchResultsMenu(), false);
-    }
-
-    private void displayToast(String stringToDisplay) {
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, stringToDisplay, duration);
-        toast.show();
     }
 
     @Override
@@ -214,13 +195,16 @@ public class SearchResultsActivity extends AppCompatActivity {
 
     private boolean hasDefinitions(Intent intent, ArrayList<SpannableString> list) {
         String userQuery = intent.getStringExtra(SearchManager.QUERY);
+        if (userQuery == null || userQuery.isEmpty()) {
+            return false;
+        }
         userQuery = userQuery.toLowerCase();
         int file = FileUtils.filetoSearch(userQuery);
 
         InputStream is = getResources().openRawResource(file);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        Document dictionnaryXml =null;
+        DocumentBuilder db;
+        Document dictionnaryXml;
         try {
             db = dbf.newDocumentBuilder();
             dictionnaryXml = db.parse(is);
@@ -246,7 +230,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 final Element definition = (Element) definitionsList.item(i);
 
                 final Element nom = (Element) definition.getElementsByTagName("mot").item(0);
-                String wordOfDictionnary = "";
+                String wordOfDictionnary;
                 if (nom != null){
                     wordOfDictionnary = nom.getTextContent();
                 } else {
@@ -258,8 +242,8 @@ public class SearchResultsActivity extends AppCompatActivity {
                     Pattern p = Pattern.compile(regexpPattern);
                     for (int cpt=0; cpt<stringArray.length; cpt++) {
                         Matcher m = p.matcher(stringArray[cpt]);
-                        removeUnwantedCharacters(stringArray, cpt, m);
-                        list.add(new SpannableString(trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
+                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
+                        list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
                     }
                     return true;
                 }
@@ -268,15 +252,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         return null;
     }
 
-    private void removeUnwantedCharacters(String[] stringArray, int cpt, Matcher m) {
-        if (m.matches()){
-            stringArray[cpt] = stringArray[cpt].replace(m.group(1), "<br><i>");
-            stringArray[cpt] = stringArray[cpt].replace(m.group(2), "</i>");
-        }
-        stringArray[cpt] = stringArray[cpt].replace(";:", "");
-        stringArray[cpt] = stringArray[cpt].replace("<li>", "");
-        stringArray[cpt] = stringArray[cpt].replace("</li>", "");
-    }
+
 
     private boolean getNeedsSave() {
         return this.needsSave;
