@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Diconfinement</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_save">Save</string>
+    <string name="vos_mots"><h3><i><b>Vos mots enregistrés</b></i></h3></string>
+
+    <string name="main_act_label" >Dictionnair.e</string>
+    <string name="def_act_label" >Définition</string>
+    <string name="hint" >Recherche dans le dico</string>
+    <string name="searchable_label">Recherche</string>
+</resources>

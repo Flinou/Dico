@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/toolbar"/>
+
+    <TextView
+        android:id="@+id/vosmots"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="15dip"
+        android:text="@string/vos_mots"
+        android:textSize="20dip">
+    </TextView>
+
+
+    <ListView
+        android:id="@+id/savedWords_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:background="@drawable/border" >
+    </ListView>
+
+</LinearLayout>

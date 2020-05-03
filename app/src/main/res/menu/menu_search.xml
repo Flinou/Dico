@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.dico.SearchResultsActivity">
+    <item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_save"
+        android:title="@string/action_save"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/search"
+        android:icon="@drawable/ic_search"
+        android:title="recherche"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <!-- WARNING collapseAsAction triggers weird search behaviours" -->
+</menu>
