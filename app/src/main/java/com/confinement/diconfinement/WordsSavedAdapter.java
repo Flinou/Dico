@@ -1,4 +1,4 @@
-package com.example.dico;
+package com.confinement.diconfinement;
 
 import android.content.Context;
 import android.os.Build;

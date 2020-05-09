@@ -1,4 +1,4 @@
-package com.example.dico;
+package com.confinement.diconfinement;
 
 import android.app.SearchManager;
 import android.app.SearchableInfo;
@@ -39,6 +39,9 @@ public class SearchResultsActivity extends AppCompatActivity {
     private final String wordUnsaved = "Mot retiré de votre liste";
     private final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     private final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
+    private final String motXml = "mot";
+    private final String defXml = "def";
+    private final String natureXml = "nature";
     private String searchedWord;
     private Menu searchResultsMenu;
     private boolean needsSave;
@@ -229,16 +232,18 @@ public class SearchResultsActivity extends AppCompatActivity {
             {
                 final Element definition = (Element) definitionsList.item(i);
 
-                final Element nom = (Element) definition.getElementsByTagName("mot").item(0);
+                final Element nom = (Element) definition.getElementsByTagName(motXml).item(0);
                 String wordOfDictionnary;
                 if (nom != null){
                     wordOfDictionnary = nom.getTextContent();
                 } else {
-                    return false;
+                    return null;
                 }
                 if (wordOfDictionnary.equalsIgnoreCase(userQuery)){
-                    String def = definition.getElementsByTagName("def").item(0).getTextContent();
+                    String def = definition.getElementsByTagName(defXml).item(0).getTextContent();
+                    String nature = definition.getElementsByTagName(natureXml).item(0).getTextContent();
                     String[] stringArray = def.split("\n");
+                    list.add(new SpannableString(Html.fromHtml(nature)));
                     Pattern p = Pattern.compile(regexpPattern);
                     for (int cpt=0; cpt<stringArray.length; cpt++) {
                         Matcher m = p.matcher(stringArray[cpt]);

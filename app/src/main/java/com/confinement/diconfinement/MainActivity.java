@@ -1,4 +1,4 @@
-package com.example.dico;
+package com.confinement.diconfinement;
 
 import android.app.SearchManager;
 import android.app.SearchableInfo;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-    private String packageName = "com.example.dico";
+    private String packageName = "com.confinement.diconfinement";
 
     protected static final String columnSuggestion = "wordSuggestion";
     protected static final Integer suggestionNumbers = 3;
