@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.dico">
+    package="com.confinement.diconfinement">
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.confinement.diconfinement.MainActivity"
             android:label="@string/main_act_label"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
@@ -24,7 +24,7 @@
                 android:value=".SearchResultsActivity" />
         </activity>
         <activity
-            android:name=".SearchResultsActivity"
+            android:name="com.confinement.diconfinement.SearchResultsActivity"
             android:label="@string/def_act_label"
             android:theme="@style/AppTheme.NoActionBar">
 
