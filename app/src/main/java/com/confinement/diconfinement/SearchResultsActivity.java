@@ -37,38 +37,45 @@ public class SearchResultsActivity extends AppCompatActivity {
 
     private final String wordSaved = "Mot sauvegardé dans votre liste";
     private final String wordUnsaved = "Mot retiré de votre liste";
-    private final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
+    private static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     private final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
-    private final String motXml = "mot";
-    private final String defXml = "def";
-    private final String natureXml = "nature";
+    private static final String motXml = "mot";
+    private static final String defXml = "def";
+    private static final String natureXml = "nature";
     private String searchedWord;
     private Menu searchResultsMenu;
     private boolean needsSave;
 
+    static Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
+        for (int i = 0; i<definitionsNumber; i++)
+        {
+            if(definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE)
+            {
+                final Element definition = (Element) definitionsList.item(i);
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.searchable_activity);
-        ListView listView = findViewById(R.id.view_list);
-        ArrayList<SpannableString> definition = handleIntent(getIntent());
-        ArrayAdapter adapter = new ArrayAdapter<>(this,
-                R.layout.textview, definition);
-        setSearchedWord("");
-        if (getIntent() != null) {
-            setTitle(getIntent().getStringExtra(SearchManager.QUERY));
-            setSearchedWord(getIntent().getStringExtra(SearchManager.QUERY));
+                final Element nom = (Element) definition.getElementsByTagName(motXml).item(0);
+                String wordOfDictionnary;
+                if (nom != null){
+                    wordOfDictionnary = nom.getTextContent();
+                } else {
+                    return null;
+                }
+                if (wordOfDictionnary.equalsIgnoreCase(userQuery)){
+                    String def = definition.getElementsByTagName(defXml).item(0).getTextContent();
+                    String nature = definition.getElementsByTagName(natureXml).item(0).getTextContent();
+                    String[] stringArray = def.split("\n");
+                    list.add(new SpannableString(Html.fromHtml(nature)));
+                    Pattern p = Pattern.compile(regexpPattern);
+                    for (int cpt=0; cpt<stringArray.length; cpt++) {
+                        Matcher m = p.matcher(stringArray[cpt]);
+                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
+                        list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
+                    }
+                    return true;
+                }
+            }
         }
-        listView.setAdapter(adapter);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_back);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(false);
-        }
+        return null;
     }
 
     private String getSearchedWord() {
@@ -196,14 +203,39 @@ public class SearchResultsActivity extends AppCompatActivity {
         return list;
     }
 
-    private boolean hasDefinitions(Intent intent, ArrayList<SpannableString> list) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.searchable_activity);
+        ListView listView = findViewById(R.id.view_list);
+        ArrayList<SpannableString> definition = handleIntent(getIntent());
+        ArrayAdapter adapter = new ArrayAdapter<>(this,
+                R.layout.textview, definition);
+        setSearchedWord("");
+        if (getIntent() != null) {
+            setTitle(getIntent().getStringExtra(SearchManager.QUERY));
+            setSearchedWord(getIntent().getStringExtra(SearchManager.QUERY));
+        }
+        listView.setAdapter(adapter);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_back);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(false);
+            }
+        }
+    }
+
+     boolean hasDefinitions(Intent intent, ArrayList<SpannableString> list) {
         String userQuery = intent.getStringExtra(SearchManager.QUERY);
         if (userQuery == null || userQuery.isEmpty()) {
             return false;
         }
         userQuery = userQuery.toLowerCase();
-        int file = FileUtils.filetoSearch(userQuery);
 
+        int file = FileUtils.filetoSearch(userQuery);
         InputStream is = getResources().openRawResource(file);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -223,38 +255,6 @@ public class SearchResultsActivity extends AppCompatActivity {
         Boolean definitionsAdded = addDefinitionsToList(list, userQuery, definitionsList, definitionsNumber);
         if (definitionsAdded != null) return definitionsAdded;
         return false;
-    }
-
-    private Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
-        for (int i = 0; i<definitionsNumber; i++)
-        {
-            if(definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE)
-            {
-                final Element definition = (Element) definitionsList.item(i);
-
-                final Element nom = (Element) definition.getElementsByTagName(motXml).item(0);
-                String wordOfDictionnary;
-                if (nom != null){
-                    wordOfDictionnary = nom.getTextContent();
-                } else {
-                    return null;
-                }
-                if (wordOfDictionnary.equalsIgnoreCase(userQuery)){
-                    String def = definition.getElementsByTagName(defXml).item(0).getTextContent();
-                    String nature = definition.getElementsByTagName(natureXml).item(0).getTextContent();
-                    String[] stringArray = def.split("\n");
-                    list.add(new SpannableString(Html.fromHtml(nature)));
-                    Pattern p = Pattern.compile(regexpPattern);
-                    for (int cpt=0; cpt<stringArray.length; cpt++) {
-                        Matcher m = p.matcher(stringArray[cpt]);
-                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
-                        list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
-                    }
-                    return true;
-                }
-            }
-        }
-        return null;
     }
 
 
