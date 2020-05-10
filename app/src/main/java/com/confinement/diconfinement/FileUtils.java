@@ -17,11 +17,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class FileUtils {
+class FileUtils {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
     private static String wordOne = "a";
@@ -41,30 +42,32 @@ public class FileUtils {
     private static String filename= "savedWords";
     private static String tempfilename= "tempfile";
 
-    public static int filetoSearch(String query){
+    static Integer filetoSearch(String query){
+        final Collator instance = Collator.getInstance();
+        instance.setStrength(Collator.NO_DECOMPOSITION);
         if (query != null){
-            if (query.compareTo(wordTwo) < 0 ){
+            if (instance.compare(query, wordTwo) < 0 ){
                 return hashFiles.get(wordOne);
-            } else if (query.compareTo(wordThree) < 0 ) {
+            } else if (instance.compare(query, wordThree) < 0 ) {
                 return hashFiles.get(wordTwo);
-            } else if (query.compareTo(wordFour) < 0 ) {
+            } else if (instance.compare(query, wordFour) < 0 ) {
                 return hashFiles.get(wordThree);
-            } else if (query.compareTo(wordFive) < 0 ) {
+            } else if (instance.compare(query, wordFive) < 0 ) {
                 return hashFiles.get(wordFour);
-            } else if (query.compareTo(wordSix) < 0 ) {
+            } else if (instance.compare(query, wordSix) < 0) {
                 return hashFiles.get(wordFive);
             } else {
                 return hashFiles.get(wordSix);
             }
         }
-        return Integer.parseInt(null);
+        return null;
     }
 
     static void writeToFile(File filePath, String wordToAdd) {
         File file = new File(filePath, filename);
         try {
             FileWriter writer = new FileWriter(file, true);
-            writer.append(wordToAdd + '\n');
+            writer.append(wordToAdd).append('\n');
             writer.close();
         } catch (IOException e) {
             System.out.println("writeToFile : An error occurred adding word to dictionnary file.");
