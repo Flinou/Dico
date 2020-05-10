@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         String[] columns = {"_id", columnSuggestion};
         MatrixCursor cursor = new MatrixCursor(columns);
         if (query.length() >= suggestionNumbers) {
-            ArrayList<String> suggestions = FileUtils.retrieveSuggestions(getApplicationContext(), query);
+            ArrayList<String> suggestions = FileUtils.retrieveSuggestions(getApplicationContext().getResources().openRawResource(R.raw.dico), query);
             DisplayUtils.addSuggestions(cursor, suggestions);
 
             SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);

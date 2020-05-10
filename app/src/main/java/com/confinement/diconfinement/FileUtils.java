@@ -6,6 +6,8 @@ import android.text.SpannableString;
 
 import androidx.annotation.RequiresApi;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -103,15 +105,14 @@ class FileUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static ArrayList<String> retrieveSuggestions(Context context, String wordToComplete) {
+    static ArrayList<String> retrieveSuggestions(InputStream is, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
         int matchNumbers = 0;
-        InputStream is = context.getResources().openRawResource(R.raw.dico);
         final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
             while (reader.ready()) {
                 String currentLine = reader.readLine();
-                if (currentLine.startsWith(wordToComplete) && matchNumbers <  MainActivity.suggestionNumbers) {
+                if ((currentLine.startsWith(wordToComplete) || StringUtils.stripAccents(currentLine).startsWith(wordToComplete)) && matchNumbers <  MainActivity.suggestionNumbers) {
                     matchNumbers++;
                     suggestions.add(currentLine);
                 } else if (matchNumbers >= MainActivity.suggestionNumbers) {
