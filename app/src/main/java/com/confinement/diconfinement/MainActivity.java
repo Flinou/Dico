@@ -122,20 +122,16 @@ public class MainActivity extends AppCompatActivity {
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         String[] columns = {"_id", columnSuggestion};
         MatrixCursor cursor = new MatrixCursor(columns);
-        if (query.length() >= suggestionNumbers) {
             ArrayList<String> suggestions = FileUtils.retrieveSuggestions(getApplicationContext().getResources().openRawResource(R.raw.dico), query);
-            DisplayUtils.addSuggestions(cursor, suggestions);
-
-            SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
-            AddListenersToSuggestions(searchView);
+            if (suggestions != null && !suggestions.isEmpty()) {
+                DisplayUtils.addSuggestions(cursor, suggestions);
+                SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+                searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+                AddListenersToSuggestions(searchView);
+            }
+            //Notify search view adapter of changes
             searchView.setSuggestionsAdapter(new AutoCompletionAdapter(this, cursor));
             searchView.getSuggestionsAdapter().notifyDataSetChanged();
-        } else {
-            searchView.setSuggestionsAdapter(new AutoCompletionAdapter(this, cursor));
-            searchView.getSuggestionsAdapter().notifyDataSetChanged();
-        }
-
     }
 
     private void AddListenersToSuggestions(final SearchView searchView) {

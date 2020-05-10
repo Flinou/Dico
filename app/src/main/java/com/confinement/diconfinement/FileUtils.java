@@ -33,6 +33,7 @@ class FileUtils {
     private static String wordFour = "infanterie";
     private static String wordFive = "ottonienne";
     private static String wordSix = "runique";
+    protected static final Integer suggestionsMinLength = 3;
     private static HashMap<String, Integer> hashFiles = new HashMap<String, Integer>() {{
         put(wordOne, R.raw.dico1);
         put(wordTwo, R.raw.dico2);
@@ -107,21 +108,23 @@ class FileUtils {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<String> retrieveSuggestions(InputStream is, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
-        int matchNumbers = 0;
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try {
-            while (reader.ready()) {
-                String currentLine = reader.readLine();
-                if ((currentLine.startsWith(wordToComplete) || StringUtils.stripAccents(currentLine).startsWith(wordToComplete)) && matchNumbers <  MainActivity.suggestionNumbers) {
-                    matchNumbers++;
-                    suggestions.add(currentLine);
-                } else if (matchNumbers >= MainActivity.suggestionNumbers) {
-                    break;
+        if (wordToComplete.length() >= suggestionsMinLength) {
+            int matchNumbers = 0;
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            try {
+                while (reader.ready()) {
+                    String currentLine = reader.readLine();
+                    if ((currentLine.startsWith(wordToComplete) || StringUtils.stripAccents(currentLine).startsWith(wordToComplete)) && matchNumbers < MainActivity.suggestionNumbers) {
+                        matchNumbers++;
+                        suggestions.add(currentLine);
+                    } else if (matchNumbers >= MainActivity.suggestionNumbers) {
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ArrayList<>();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
         }
         return suggestions;
     }
