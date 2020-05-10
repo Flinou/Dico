@@ -235,25 +235,27 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
         userQuery = userQuery.toLowerCase();
 
-        int file = FileUtils.filetoSearch(userQuery);
-        InputStream is = getResources().openRawResource(file);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db;
-        Document dictionnaryXml;
-        try {
-            db = dbf.newDocumentBuilder();
-            dictionnaryXml = db.parse(is);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        Integer file = FileUtils.filetoSearch(userQuery);
+         if (file != null) {
+             InputStream is = getResources().openRawResource(file);
+             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+             DocumentBuilder db;
+             Document dictionnaryXml;
+             try {
+                 db = dbf.newDocumentBuilder();
+                 dictionnaryXml = db.parse(is);
+             } catch (Exception e) {
+                 e.printStackTrace();
+                 return false;
+             }
 
-        final Element dictionnaryRacine = dictionnaryXml.getDocumentElement();
-        final NodeList definitionsList = dictionnaryRacine.getChildNodes();
-        final int definitionsNumber = definitionsList.getLength();
+             final Element dictionnaryRacine = dictionnaryXml.getDocumentElement();
+             final NodeList definitionsList = dictionnaryRacine.getChildNodes();
+             final int definitionsNumber = definitionsList.getLength();
 
-        Boolean definitionsAdded = addDefinitionsToList(list, userQuery, definitionsList, definitionsNumber);
-        if (definitionsAdded != null) return definitionsAdded;
+             Boolean definitionsAdded = addDefinitionsToList(list, userQuery, definitionsList, definitionsNumber);
+             if (definitionsAdded != null) return definitionsAdded;
+         }
         return false;
     }
 
