@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.MatrixCursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,13 +16,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -29,15 +33,18 @@ public class MainActivity extends AppCompatActivity {
 
     protected static final String columnSuggestion = "wordSuggestion";
     protected static final Integer suggestionNumbers = 3;
-    private final String wordUnsaved = "Mot retiré de votre liste";
+
     private Menu menu;
+    private TreeSet<String> wordsForSuggestSet = null;
+    private Handler handler = new Handler();
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final ListView listView = findViewById(R.id.savedWords_list);
         displaySavedWords(listView);
@@ -54,13 +61,53 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.pBar);
 
+        new Thread(new Runnable() {
+            public void run() {
+                    handler.post(new Runnable() {
+                        public void run() {
+                            System.out.println("ici");
+                        }
+                    });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            displaySpinner(toolbar, listView, progressBar);
+                        }
+                    });
+                    wordsForSuggestSet = FileUtils.putWordsSuggestInSet(getApplicationContext().getResources().openRawResource(R.raw.dico));
+                    FileUtils.initializeDictionary(getApplicationContext());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideSpinner(progressBar, toolbar, listView);
+                        }
+                    });
+                }
+        }).start();
     }
 
-    protected void refreshPage(){
-        this.recreate();
-        DisplayUtils.displayToast(getApplicationContext(), wordUnsaved);
+    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, ListView listView) {
+        progressBar.setVisibility(View.GONE);
+        TextView loadingText = (TextView) findViewById(R.id.loadingTextView);
+        loadingText.setVisibility(View.GONE);
+        toolbar.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.VISIBLE);
+        TextView textV = (TextView) findViewById(R.id.vosmots);
+        textV.setVisibility(View.VISIBLE);
     }
+
+    private void displaySpinner(Toolbar toolbar, ListView listView, ProgressBar progressBar) {
+        toolbar.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
+        TextView textV = (TextView) findViewById(R.id.vosmots);
+        textV.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView loadingText = (TextView) findViewById(R.id.loadingTextView);
+        loadingText.setVisibility(View.VISIBLE);
+    }
+
 
     private Intent createSearchIntent(SpannableString savedWord) {
         Intent intent = new Intent();
@@ -122,19 +169,23 @@ public class MainActivity extends AppCompatActivity {
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         String[] columns = {"_id", columnSuggestion};
         MatrixCursor cursor = new MatrixCursor(columns);
-            ArrayList<String> suggestions = FileUtils.retrieveSuggestions(getApplicationContext().getResources().openRawResource(R.raw.dico), query);
+        ArrayList<String> suggestions = FileUtils.retrieveSuggestions(wordsForSuggestSet, query);
             if (suggestions != null && !suggestions.isEmpty()) {
                 DisplayUtils.addSuggestions(cursor, suggestions);
                 SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-                searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
-                AddListenersToSuggestions(searchView);
+                //searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
+                addListenersToSuggestions(searchView);
             }
-            //Notify search view adapter of changes
-            searchView.setSuggestionsAdapter(new AutoCompletionAdapter(this, cursor));
-            searchView.getSuggestionsAdapter().notifyDataSetChanged();
+        autoCompleteRefresh(searchView, cursor);
     }
 
-    private void AddListenersToSuggestions(final SearchView searchView) {
+    private void autoCompleteRefresh(SearchView searchView, MatrixCursor cursor) {
+        //Notify search view adapter of changes in the suggestion field
+        searchView.setSuggestionsAdapter(new AutoCompletionAdapter(this, cursor));
+        searchView.getSuggestionsAdapter().notifyDataSetChanged();
+    }
+
+    private void addListenersToSuggestions(final SearchView searchView) {
         searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
             public boolean onSuggestionSelect(int position) {
