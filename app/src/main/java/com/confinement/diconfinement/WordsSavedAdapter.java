@@ -31,6 +31,7 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        final WordsSavedAdapter wsa = this;
         View rowView = inflater.inflate(R.layout.savedwords_text_view, parent, false);
         TextView textView = rowView.findViewById(R.id.savedwordstextview);
         ImageView imageView = rowView.findViewById(R.id.logo);
@@ -41,7 +42,9 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
             public void onClick(View view) {
                 File filesDir = context.getFilesDir();
                 FileUtils.removeFromFile(filesDir, objects.get(position).toString());
-                ((MainActivity) context).refreshPage();
+                objects.remove(objects.get(position));
+                wsa.notifyDataSetChanged();
+                DisplayUtils.displayToast(context, FileUtils.wordUnsaved);
             }
         });
 

@@ -6,7 +6,10 @@ import android.text.SpannableString;
 
 import androidx.annotation.RequiresApi;
 
-import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,44 +26,56 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TreeSet;
 
-class FileUtils {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+class FileUtils  {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
-    private static String wordOne = "a";
-    private static String wordTwo = "chalcophile";
-    private static String wordThree = "empeigne";
-    private static String wordFour = "infanterie";
-    private static String wordFive = "ottonienne";
-    private static String wordSix = "runique";
-    protected static final Integer suggestionsMinLength = 3;
-    private static HashMap<String, Integer> hashFiles = new HashMap<String, Integer>() {{
-        put(wordOne, R.raw.dico1);
-        put(wordTwo, R.raw.dico2);
-        put(wordThree, R.raw.dico3);
-        put(wordFour, R.raw.dico4);
-        put(wordFive, R.raw.dico5);
-        put(wordSix, R.raw.dico6);
-    }};
+
+    public static final String wordAttribute = "val";
+    public static final String wordUnsaved = "Mot retiré de votre liste";
+    private static final Integer suggestionsMinLength = 3;
+    private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<String, Integer>();
+    /*private static HashMap<Integer, Integer> intDicoHashMap = new HashMap<Integer, Integer>() {{
+        put(1, R.raw.dico1);
+        put(2, R.raw.dico2);
+        put(3, R.raw.dico3);
+        put(4, R.raw.dico4);
+        put(5, R.raw.dico5);
+        put(6, R.raw.dico6);
+        put(7, R.raw.dico7);
+        put(8, R.raw.dico8);
+        put(9, R.raw.dico9);
+        put(10, R.raw.dico10);
+        put(11, R.raw.dico11);
+        put(12, R.raw.dico12);
+        put(13, R.raw.dico13);
+        put(14, R.raw.dico14);
+        put(15, R.raw.dico15);
+        put(16, R.raw.dico16);
+        put(17, R.raw.dico17);
+        put(18, R.raw.dico18);
+        put(19, R.raw.dico19);
+    }};*/
     private static String filename= "savedWords";
-    private static String tempfilename= "tempfile";
+
 
     static Integer filetoSearch(String query){
         final Collator instance = Collator.getInstance();
-        instance.setStrength(Collator.NO_DECOMPOSITION);
-        if (query != null){
-            if (instance.compare(query, wordTwo) < 0 ){
-                return hashFiles.get(wordOne);
-            } else if (instance.compare(query, wordThree) < 0 ) {
-                return hashFiles.get(wordTwo);
-            } else if (instance.compare(query, wordFour) < 0 ) {
-                return hashFiles.get(wordThree);
-            } else if (instance.compare(query, wordFive) < 0 ) {
-                return hashFiles.get(wordFour);
-            } else if (instance.compare(query, wordSix) < 0) {
-                return hashFiles.get(wordFive);
-            } else {
-                return hashFiles.get(wordSix);
+        instance.setStrength(Collator.FULL_DECOMPOSITION);
+        List<String> wordDicoKeys = new ArrayList<String>(wordDicoHashMap.keySet());
+        //Reverse wordDicoKeys because it's simpler to compare user query browsing dictionary from the end to the beginning
+        Collections.reverse(wordDicoKeys);
+        if (query != null) {
+            for (String firstDef : wordDicoKeys) {
+                if (instance.compare(query, firstDef) > 0) {
+                    return wordDicoHashMap.get(firstDef);
+                }
             }
         }
         return null;
@@ -90,7 +105,6 @@ class FileUtils {
         }
         InputStreamReader inputStreamReader =
                 new InputStreamReader(fis, StandardCharsets.UTF_8);
-        StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
             String line = reader.readLine();
             while (line != null) {
@@ -105,25 +119,32 @@ class FileUtils {
         return true;
     }
 
+    static TreeSet<String> putWordsSuggestInSet(InputStream is) {
+        TreeSet<String> wordsListSet = new TreeSet<>();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try {
+            while (reader.ready()) {
+                String currentLine = reader.readLine();
+                wordsListSet.add(currentLine);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return wordsListSet;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static ArrayList<String> retrieveSuggestions(InputStream is, String wordToComplete) {
+    static ArrayList<String> retrieveSuggestions(TreeSet<String> dictioSet, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
-        if (wordToComplete.length() >= suggestionsMinLength) {
-            int matchNumbers = 0;
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            try {
-                while (reader.ready()) {
-                    String currentLine = reader.readLine();
-                    if ((currentLine.startsWith(wordToComplete) || StringUtils.stripAccents(currentLine).startsWith(wordToComplete)) && matchNumbers < MainActivity.suggestionNumbers) {
-                        matchNumbers++;
-                        suggestions.add(currentLine);
-                    } else if (matchNumbers >= MainActivity.suggestionNumbers) {
-                        break;
-                    }
+        if (wordToComplete != null && wordToComplete.length() >= suggestionsMinLength) {
+            dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE);
+            int size = 0;
+            for (String suggestion : dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE)) {
+                if (size == MainActivity.suggestionNumbers) {
+                    break;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ArrayList<>();
+                suggestions.add(suggestion);
+                size++;
             }
         }
         return suggestions;
@@ -133,7 +154,8 @@ class FileUtils {
     static void removeFromFile(File filePath, String wordToRemove) {
 
         File savedWordsFile = new File(filePath, filename);
-        File tempFile = new File(filePath, tempfilename);
+        String tempFileName = "tempfile";
+        File tempFile = new File(filePath, tempFileName);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(savedWordsFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
@@ -161,7 +183,7 @@ class FileUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<SpannableString> retrieveSavedWords(Context context) {
-        ArrayList<SpannableString> savedWordslist = new ArrayList<>();
+        ArrayList<SpannableString> savedWordsList = new ArrayList<>();
         ArrayList<String> savedWordsString = new ArrayList<>();
 
         FileInputStream fis;
@@ -169,22 +191,22 @@ class FileUtils {
             fis = context.openFileInput(filename);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return savedWordslist;
+            return savedWordsList;
         }
         if (fis == null) {
-            return savedWordslist;
+            return savedWordsList;
         }
 
         InputStreamReader inputStreamReader =
                 new InputStreamReader(fis, StandardCharsets.UTF_8);
         try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
             readSavedWordsList(savedWordsString, reader);
-            SortAndConvertToSpannableList(savedWordslist, savedWordsString);
+            SortAndConvertToSpannableList(savedWordsList, savedWordsString);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return savedWordslist;
+        return savedWordsList;
     }
 
     private static void readSavedWordsList(ArrayList<String> savedWordsString, BufferedReader reader) throws IOException {
@@ -196,11 +218,52 @@ class FileUtils {
         }
     }
 
-    private static void SortAndConvertToSpannableList(ArrayList<SpannableString> savedWordslist, ArrayList<String> savedWordsString) {
+    private static void SortAndConvertToSpannableList(ArrayList<SpannableString> savedWordsList, ArrayList<String> savedWordsString) {
         if (savedWordsString.size() != 0) {
             Collections.sort(savedWordsString);
             for (String word : savedWordsString) {
-                savedWordslist.add(new SpannableString(word));
+                savedWordsList.add(new SpannableString(word));
+            }
+        }
+    }
+
+    public static void initializeDictionary(Context applicationContext) {
+        final String defPackage = "com.confinement.diconfinement";
+        final String dicoIdentifierPattern = "dico";
+        //Way to retrieve number of dictionary files in raw folder
+        int dictionNumbers=R.raw.class.getFields().length;
+
+        //length - 1 in loop because there is dico.txt file
+        for (int i=1; i<=dictionNumbers - 1; i++){
+            String dicoIdentifierString = dicoIdentifierPattern + i;
+
+            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", defPackage);
+            InputStream is = applicationContext.getResources().openRawResource(dictionaryId);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db;
+            Document dictionaryXml = null;
+            try {
+                db = dbf.newDocumentBuilder();
+                dictionaryXml = db.parse(is);
+            } catch (Exception e) {
+                System.out.println(i);
+                e.printStackTrace();
+            }
+
+            final Element dictionnaryRacine = dictionaryXml.getDocumentElement();
+            final NodeList definitionsList = dictionnaryRacine.getChildNodes();
+            final int definitionsNumber = definitionsList.getLength();
+            retrieveFirstDef(definitionsList, definitionsNumber, dictionaryId);
+        }
+    }
+
+    private static void retrieveFirstDef(NodeList definitionsList, int definitionsNumber,int dictionaryId) {
+        for (int i=0; i<definitionsNumber; i++) {
+            if (definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                final Element definition = (Element) definitionsList.item(i);
+                String firstWord = definition.getAttribute(wordAttribute);
+                wordDicoHashMap.put(firstWord, dictionaryId);
+                break;
             }
         }
     }
