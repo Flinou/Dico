@@ -36,7 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class SearchResultsActivity extends AppCompatActivity {
 
     private final String wordSaved = "Mot sauvegardé dans votre liste";
-    private final String wordUnsaved = "Mot retiré de votre liste";
+    static final String wordUnsaved = "Mot retiré de votre liste";
     private static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     private final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
 
@@ -124,21 +124,17 @@ public class SearchResultsActivity extends AppCompatActivity {
         setSearchResultsMenu(menu);
         String wordToSave = getSearchedWord();
         boolean needsSave = FileUtils.needsSave(getApplicationContext(), wordToSave);
-        setIconAlpha(menu, needsSave);
+        setIconAlpha(needsSave);
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void setIconAlpha(Menu menu, boolean needsSave) {
+    private void setIconAlpha(boolean needsSave) {
         Drawable resIcon = getResources().getDrawable(R.drawable.ic_save);
         if (needsSave) {
             resIcon.setAlpha(255);
         } else {
             resIcon.setAlpha(50);
         }
-    }
-
-    private Menu getSearchResultsMenu() {
-        return this.searchResultsMenu;
     }
 
     private void setSearchResultsMenu(Menu menu) {
@@ -176,7 +172,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         FileUtils.removeFromFile(filesDir, wordToRemove);
         DisplayUtils.displayToast(getApplicationContext(), wordUnsaved);
         setNeedsSave(true);
-        setIconAlpha(getSearchResultsMenu(), true);
+        setIconAlpha(true);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -184,7 +180,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         FileUtils.writeToFile(filesDir, wordToSave);
         DisplayUtils.displayToast(getApplicationContext(),wordSaved);
         setNeedsSave(false);
-        setIconAlpha(getSearchResultsMenu(), false);
+        setIconAlpha(false);
     }
 
     @Override

@@ -35,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     protected static final Integer suggestionNumbers = 3;
 
     private Menu menu;
-    private TreeSet<String> wordsForSuggestSet = null;
+
+
+    private TreeSet<String> dicoWords = null;
     private Handler handler = new Handler();
 
 
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.pBar);
+        final ProgressBar progressBar = findViewById(R.id.pBar);
 
         new Thread(new Runnable() {
             public void run() {
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                             displaySpinner(toolbar, listView, progressBar);
                         }
                     });
-                    wordsForSuggestSet = FileUtils.putWordsSuggestInSet(getApplicationContext().getResources().openRawResource(R.raw.dico));
+                    setDicoWords(FileUtils.populateDicoWords(getApplicationContext().getResources().openRawResource(R.raw.dico)));
                     FileUtils.initializeDictionary(getApplicationContext());
                     runOnUiThread(new Runnable() {
                         @Override
@@ -88,23 +90,31 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    public void setDicoWords(TreeSet<String> dicoWords) {
+        this.dicoWords = dicoWords;
+    }
+
+    public TreeSet<String> getDicoWords() {
+        return dicoWords;
+    }
+
     private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, ListView listView) {
         progressBar.setVisibility(View.GONE);
-        TextView loadingText = (TextView) findViewById(R.id.loadingTextView);
+        TextView loadingText = findViewById(R.id.loadingTextView);
         loadingText.setVisibility(View.GONE);
         toolbar.setVisibility(View.VISIBLE);
         listView.setVisibility(View.VISIBLE);
-        TextView textV = (TextView) findViewById(R.id.vosmots);
+        TextView textV =findViewById(R.id.vosmots);
         textV.setVisibility(View.VISIBLE);
     }
 
     private void displaySpinner(Toolbar toolbar, ListView listView, ProgressBar progressBar) {
         toolbar.setVisibility(View.GONE);
         listView.setVisibility(View.GONE);
-        TextView textV = (TextView) findViewById(R.id.vosmots);
+        TextView textV = findViewById(R.id.vosmots);
         textV.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        TextView loadingText = (TextView) findViewById(R.id.loadingTextView);
+        TextView loadingText = findViewById(R.id.loadingTextView);
         loadingText.setVisibility(View.VISIBLE);
     }
 
@@ -138,10 +148,8 @@ public class MainActivity extends AppCompatActivity {
         this.menu = menu;
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final MenuItem searchMenuItem = menu.findItem(R.id.search);
         final SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
-        SearchableInfo searchinfo = searchManager.getSearchableInfo(getComponentName());
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
@@ -169,11 +177,9 @@ public class MainActivity extends AppCompatActivity {
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         String[] columns = {"_id", columnSuggestion};
         MatrixCursor cursor = new MatrixCursor(columns);
-        ArrayList<String> suggestions = FileUtils.retrieveSuggestions(wordsForSuggestSet, query);
-            if (suggestions != null && !suggestions.isEmpty()) {
+        ArrayList<String> suggestions = FileUtils.retrieveSuggestions(getDicoWords(), query);
+            if (!suggestions.isEmpty()) {
                 DisplayUtils.addSuggestions(cursor, suggestions);
-                SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-                //searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
                 addListenersToSuggestions(searchView);
             }
         autoCompleteRefresh(searchView, cursor);

@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeSet;
@@ -37,31 +36,9 @@ class FileUtils  {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
 
-    public static final String wordAttribute = "val";
-    public static final String wordUnsaved = "Mot retiré de votre liste";
-    private static final Integer suggestionsMinLength = 3;
+    static final String wordAttribute = "val";
+    static final Integer suggestionsMinLength = 3;
     private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<String, Integer>();
-    /*private static HashMap<Integer, Integer> intDicoHashMap = new HashMap<Integer, Integer>() {{
-        put(1, R.raw.dico1);
-        put(2, R.raw.dico2);
-        put(3, R.raw.dico3);
-        put(4, R.raw.dico4);
-        put(5, R.raw.dico5);
-        put(6, R.raw.dico6);
-        put(7, R.raw.dico7);
-        put(8, R.raw.dico8);
-        put(9, R.raw.dico9);
-        put(10, R.raw.dico10);
-        put(11, R.raw.dico11);
-        put(12, R.raw.dico12);
-        put(13, R.raw.dico13);
-        put(14, R.raw.dico14);
-        put(15, R.raw.dico15);
-        put(16, R.raw.dico16);
-        put(17, R.raw.dico17);
-        put(18, R.raw.dico18);
-        put(19, R.raw.dico19);
-    }};*/
     private static String filename= "savedWords";
 
 
@@ -119,7 +96,7 @@ class FileUtils  {
         return true;
     }
 
-    static TreeSet<String> putWordsSuggestInSet(InputStream is) {
+    static TreeSet<String> populateDicoWords(InputStream is) {
         TreeSet<String> wordsListSet = new TreeSet<>();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
@@ -227,7 +204,7 @@ class FileUtils  {
         }
     }
 
-    public static void initializeDictionary(Context applicationContext) {
+    static void initializeDictionary(Context applicationContext) {
         final String defPackage = "com.confinement.diconfinement";
         final String dicoIdentifierPattern = "dico";
         //Way to retrieve number of dictionary files in raw folder
