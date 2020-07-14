@@ -39,7 +39,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private final String wordUnsaved = "Mot retiré de votre liste";
     private static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     private final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
-    private static final String motXml = "mot";
+
     private static final String defXml = "def";
     private static final String natureXml = "nature";
     private String searchedWord;
@@ -47,20 +47,17 @@ public class SearchResultsActivity extends AppCompatActivity {
     private boolean needsSave;
 
     static Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
+        boolean previousDefinitionsFound = false;
         for (int i = 0; i<definitionsNumber; i++)
         {
             if(definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE)
             {
                 final Element definition = (Element) definitionsList.item(i);
 
-                final Element nom = (Element) definition.getElementsByTagName(motXml).item(0);
-                String wordOfDictionnary;
-                if (nom != null){
-                    wordOfDictionnary = nom.getTextContent();
-                } else {
-                    return null;
-                }
-                if (wordOfDictionnary.equalsIgnoreCase(userQuery)){
+                String wordOfDictionnary = definition.getAttribute(FileUtils.wordAttribute);
+
+                if (wordOfDictionnary != null && wordOfDictionnary.equalsIgnoreCase(userQuery)){
+                    previousDefinitionsFound = true;
                     String def = definition.getElementsByTagName(defXml).item(0).getTextContent();
                     String nature = definition.getElementsByTagName(natureXml).item(0).getTextContent();
                     String[] stringArray = def.split("\n");
@@ -71,6 +68,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                         DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
                         list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
                     }
+                } else if (!wordOfDictionnary.equalsIgnoreCase(userQuery) && previousDefinitionsFound){
                     return true;
                 }
             }
@@ -150,6 +148,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         // handle arrow click here
         switch (item.getItemId())  {
             case android.R.id.home :
