@@ -1,7 +1,6 @@
 package com.confinement.diconfinement;
 
 import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -67,26 +65,21 @@ public class MainActivity extends AppCompatActivity {
 
         new Thread(new Runnable() {
             public void run() {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            System.out.println("ici");
-                        }
-                    });
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            displaySpinner(toolbar, listView, progressBar);
-                        }
-                    });
-                    setDicoWords(FileUtils.populateDicoWords(getApplicationContext().getResources().openRawResource(R.raw.dico)));
-                    FileUtils.initializeDictionary(getApplicationContext());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            hideSpinner(progressBar, toolbar, listView);
-                        }
-                    });
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        displaySpinner(toolbar, listView, progressBar);
+                    }
+                });
+                setDicoWords(FileUtils.populateDicoWords(getApplicationContext().getResources().openRawResource(R.raw.dico)));
+                FileUtils.initFirstWordDicoHashMap(getApplicationContext());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideSpinner(progressBar, toolbar, listView);
+                    }
+                });
+            }
         }).start();
     }
 
