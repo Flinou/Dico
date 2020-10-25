@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -204,11 +206,11 @@ class FileUtils  {
         }
     }
 
-    static void initializeDictionary(Context applicationContext) {
+    static void initFirstWordDicoHashMap(Context applicationContext) {
         final String defPackage = "com.confinement.diconfinement";
         final String dicoIdentifierPattern = "dico";
         //Way to retrieve number of dictionary files in raw folder
-        int dictionNumbers=R.raw.class.getFields().length;
+        int dictionNumbers= R.raw.class.getFields().length;
 
         //length - 1 in loop because there is dico.txt file
         for (int i=1; i<=dictionNumbers - 1; i++){
@@ -216,32 +218,25 @@ class FileUtils  {
 
             int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", defPackage);
             InputStream is = applicationContext.getResources().openRawResource(dictionaryId);
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db;
-            Document dictionaryXml = null;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             try {
-                db = dbf.newDocumentBuilder();
-                dictionaryXml = db.parse(is);
-            } catch (Exception e) {
-                System.out.println(i);
+                String line = reader.readLine();
+                //We stop browsing dico at the first definition
+                while(!line.contains("definition")){
+                    line = reader.readLine();
+                }
+                //Regexp to retrieve first word of the definition. XML is like : "    <definition val="firstWord">"
+                Pattern p = Pattern.compile("\\s*<.* .*\"(.*)\">");
+                Matcher m = p.matcher(line);
+                String fileFirstWord = null;
+                if (m.matches()){
+                    fileFirstWord = m.group(1);
+                    wordDicoHashMap.put(fileFirstWord, dictionaryId);
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            final Element dictionnaryRacine = dictionaryXml.getDocumentElement();
-            final NodeList definitionsList = dictionnaryRacine.getChildNodes();
-            final int definitionsNumber = definitionsList.getLength();
-            retrieveFirstDef(definitionsList, definitionsNumber, dictionaryId);
-        }
-    }
-
-    private static void retrieveFirstDef(NodeList definitionsList, int definitionsNumber,int dictionaryId) {
-        for (int i=0; i<definitionsNumber; i++) {
-            if (definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                final Element definition = (Element) definitionsList.item(i);
-                String firstWord = definition.getAttribute(wordAttribute);
-                wordDicoHashMap.put(firstWord, dictionaryId);
-                break;
-            }
         }
     }
 }
