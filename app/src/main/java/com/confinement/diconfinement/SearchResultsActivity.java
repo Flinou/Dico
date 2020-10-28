@@ -3,6 +3,7 @@ package com.confinement.diconfinement;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -35,16 +36,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class SearchResultsActivity extends AppCompatActivity {
 
-    private final String wordSaved = "Mot sauvegardé dans votre liste";
-    static final String wordUnsaved = "Mot retiré de votre liste";
-    private static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
-    private final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
-
-    private static final String defXml = "def";
-    private static final String natureXml = "nature";
     private String searchedWord;
     private Menu searchResultsMenu;
     private boolean needsSave;
+
+    private Menu menu;
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
+    private String packageName = "com.confinement.diconfinement";
 
     static Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
         boolean previousDefinitionsFound = false;
@@ -58,11 +63,11 @@ public class SearchResultsActivity extends AppCompatActivity {
 
                 if (wordOfDictionnary != null && wordOfDictionnary.equalsIgnoreCase(userQuery)){
                     previousDefinitionsFound = true;
-                    String def = definition.getElementsByTagName(defXml).item(0).getTextContent();
-                    String nature = definition.getElementsByTagName(natureXml).item(0).getTextContent();
+                    String def = definition.getElementsByTagName(Globals.defXml).item(0).getTextContent();
+                    String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
                     String[] stringArray = def.split("\n");
                     list.add(new SpannableString(Html.fromHtml(nature)));
-                    Pattern p = Pattern.compile(regexpPattern);
+                    Pattern p = Pattern.compile(Globals.regexpPattern);
                     for (int cpt=0; cpt<stringArray.length; cpt++) {
                         Matcher m = p.matcher(stringArray[cpt]);
                         DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
@@ -90,6 +95,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
         setNeedsSave(FileUtils.needsSave(getApplicationContext(), getSearchedWord()));
+        setMenu(menu);
 
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -109,12 +115,27 @@ public class SearchResultsActivity extends AppCompatActivity {
                 return false;
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public boolean onQueryTextChange(String newText) {
+                AutoCompletion.getInstance().autocomplete(newText, getMenu(), (ContextWrapper) getApplicationContext());
+                return true;
+            }
+
+        });
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
                 return false;
             }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                startActivity(AutoCompletion.getInstance().createIntent(searchView));
+                return true;
+            }
         });
-        final MenuItem saveMenuItem = menu.findItem(R.id.action_save);
+        final MenuItem saveMenuItem = getMenu().findItem(R.id.action_save);
         return true;
     }
 
@@ -144,7 +165,6 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         // handle arrow click here
         switch (item.getItemId())  {
             case android.R.id.home :
@@ -170,7 +190,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void removeWordFromSavedList(File filesDir) {
         String wordToRemove = getSearchedWord();
         FileUtils.removeFromFile(filesDir, wordToRemove);
-        DisplayUtils.displayToast(getApplicationContext(), wordUnsaved);
+        DisplayUtils.displayToast(getApplicationContext(), Globals.wordUnsaved);
         setNeedsSave(true);
         setIconAlpha(true);
     }
@@ -178,7 +198,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void addWordToSavedList(File filesDir, String wordToSave) {
         FileUtils.writeToFile(filesDir, wordToSave);
-        DisplayUtils.displayToast(getApplicationContext(),wordSaved);
+        DisplayUtils.displayToast(getApplicationContext(), Globals.wordSaved);
         setNeedsSave(false);
         setIconAlpha(false);
     }
@@ -189,12 +209,11 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     private ArrayList<SpannableString> handleIntent(Intent intent) {
-
         ArrayList<SpannableString> list = new ArrayList<>();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             if (hasDefinitions(intent, list)) return list;
         }
-        list.add(new SpannableString(userQueryNotInDict));
+        list.add(new SpannableString(Globals.userQueryNotInDict));
         return list;
     }
 
@@ -229,7 +248,6 @@ public class SearchResultsActivity extends AppCompatActivity {
             return false;
         }
         userQuery = userQuery.toLowerCase();
-
         Integer file = FileUtils.filetoSearch(userQuery);
          if (file != null) {
              InputStream is = getResources().openRawResource(file);
@@ -243,7 +261,6 @@ public class SearchResultsActivity extends AppCompatActivity {
                  e.printStackTrace();
                  return false;
              }
-
              final Element dictionnaryRacine = dictionnaryXml.getDocumentElement();
              final NodeList definitionsList = dictionnaryRacine.getChildNodes();
              final int definitionsNumber = definitionsList.getLength();
@@ -254,14 +271,12 @@ public class SearchResultsActivity extends AppCompatActivity {
         return false;
     }
 
-
-
     private boolean getNeedsSave() {
         return this.needsSave;
     }
-
     private void setNeedsSave(boolean needsSave) {
         this.needsSave=needsSave;
     }
+
 }
 

@@ -44,7 +44,7 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
                 FileUtils.removeFromFile(filesDir, objects.get(position).toString());
                 objects.remove(objects.get(position));
                 wsa.notifyDataSetChanged();
-                DisplayUtils.displayToast(context, SearchResultsActivity.wordUnsaved);
+                DisplayUtils.displayToast(context, Globals.wordUnsaved);
             }
         });
 
