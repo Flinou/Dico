@@ -13,6 +13,10 @@ public class Globals extends AppCompatActivity {
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
 
+    static final Integer suggestionsMaxLength = 3;
+
+    static String savedWordsFileName = "savedWords";
+
     static String packageName = "com.confinement.diconfinement";
     static TreeSet<String> getDicoWords(InputStream is) {
         if (dicoWords == null) {

@@ -6,11 +6,6 @@ import android.text.SpannableString;
 
 import androidx.annotation.RequiresApi;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,17 +26,11 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 class FileUtils  {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
-
     static final String wordAttribute = "val";
-    static final Integer suggestionsMinLength = 3;
     private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<String, Integer>();
-    private static String filename= "savedWords";
 
 
     static Integer filetoSearch(String query){
@@ -61,7 +50,7 @@ class FileUtils  {
     }
 
     static void writeToFile(File filePath, String wordToAdd) {
-        File file = new File(filePath, filename);
+        File file = new File(filePath, Globals.savedWordsFileName);
         try {
             FileWriter writer = new FileWriter(file, true);
             writer.append(wordToAdd).append('\n');
@@ -77,7 +66,7 @@ class FileUtils  {
     static boolean needsSave(Context context, String wordToAdd) {
         FileInputStream fis;
         try {
-            fis = context.openFileInput(filename);
+            fis = context.openFileInput(Globals.savedWordsFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return true;
@@ -115,7 +104,7 @@ class FileUtils  {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<String> retrieveSuggestions(TreeSet<String> dictioSet, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
-        if (wordToComplete != null && wordToComplete.length() >= suggestionsMinLength) {
+        if (wordToComplete != null && wordToComplete.length() >= Globals.suggestionsMaxLength) {
             dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE);
             int size = 0;
             for (String suggestion : dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE)) {
@@ -132,7 +121,7 @@ class FileUtils  {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeFromFile(File filePath, String wordToRemove) {
 
-        File savedWordsFile = new File(filePath, filename);
+        File savedWordsFile = new File(filePath, Globals.savedWordsFileName);
         String tempFileName = "tempfile";
         File tempFile = new File(filePath, tempFileName);
 
@@ -162,30 +151,30 @@ class FileUtils  {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<SpannableString> retrieveSavedWords(Context context) {
-        ArrayList<SpannableString> savedWordsList = new ArrayList<>();
+        ArrayList<SpannableString> savedWordsListSorted = new ArrayList<>();
         ArrayList<String> savedWordsString = new ArrayList<>();
 
-        FileInputStream fis;
+        FileInputStream savedWordsInptStrm;
         try {
-            fis = context.openFileInput(filename);
+            savedWordsInptStrm = context.openFileInput(Globals.savedWordsFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return savedWordsList;
+            return savedWordsListSorted;
         }
-        if (fis == null) {
-            return savedWordsList;
+        if (savedWordsInptStrm == null) {
+            return savedWordsListSorted;
         }
 
-        InputStreamReader inputStreamReader =
-                new InputStreamReader(fis, StandardCharsets.UTF_8);
-        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            readSavedWordsList(savedWordsString, reader);
-            SortAndConvertToSpannableList(savedWordsList, savedWordsString);
+        InputStreamReader savedWrdsInptStrmRdr =
+                new InputStreamReader(savedWordsInptStrm, StandardCharsets.UTF_8);
+        try (BufferedReader savedWordsReader = new BufferedReader(savedWrdsInptStrmRdr)) {
+            readSavedWordsList(savedWordsString, savedWordsReader);
+            SortAndConvertToSpannableList(savedWordsListSorted, savedWordsString);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return savedWordsList;
+        return savedWordsListSorted;
     }
 
     private static void readSavedWordsList(ArrayList<String> savedWordsString, BufferedReader reader) throws IOException {
