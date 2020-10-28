@@ -18,8 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.Collator;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeSet;
@@ -188,7 +190,14 @@ class FileUtils  {
 
     private static void SortAndConvertToSpannableList(ArrayList<SpannableString> savedWordsList, ArrayList<String> savedWordsString) {
         if (savedWordsString.size() != 0) {
-            Collections.sort(savedWordsString);
+            Collections.sort(savedWordsString, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    o1 = Normalizer.normalize(o1, Normalizer.Form.NFD);
+                    o2 = Normalizer.normalize(o2, Normalizer.Form.NFD);
+                    return o1.compareTo(o2);
+                }
+            });
             for (String word : savedWordsString) {
                 savedWordsList.add(new SpannableString(word));
             }
