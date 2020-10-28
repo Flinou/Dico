@@ -2,7 +2,7 @@
     android:width="24dp"
     android:height="24dp"
     android:alpha="0.8"
-    android:tint="#6200EE"
+    android:tint="#03A9F4"
     android:viewportWidth="28.8"
     android:viewportHeight="28.8">
   <group android:translateX="2.4"
