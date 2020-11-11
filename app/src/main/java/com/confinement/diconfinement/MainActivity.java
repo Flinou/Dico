@@ -28,7 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     protected static final String columnSuggestion = "wordSuggestion";
     protected static final Integer suggestionNumbers = 3;
+    Integer index, top;
     private Menu menu;
+    ListView listView = null;
 
     public Menu getMenu() {
         return menu;
@@ -43,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
+        listView = findViewById(R.id.savedWords_list);
         setSupportActionBar(toolbar);
-        final ListView listView = findViewById(R.id.savedWords_list);
+
         displaySavedWords(listView);
         final ImageView imageView = findViewById(R.id.logo);
 
@@ -52,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object obj = listView.getItemAtPosition(position);
+                //Save list index and top when exiting activity
+                index = listView.getFirstVisiblePosition();
+                View v = listView.getChildAt(0);
+                top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
                 SpannableString savedWord = (SpannableString) obj;
                 if (savedWord != null) {
                     Intent intent = createSearchIntent(savedWord);
@@ -114,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         displaySavedWords((ListView) findViewById(R.id.savedWords_list));
+        //Set saved list position when returning to activity
+        if (index != null && top != null){
+            listView.setSelectionFromTop(index, top);
+        }
         super.onResume();
     }
 
