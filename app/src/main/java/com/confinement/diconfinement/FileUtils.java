@@ -1,6 +1,9 @@
 package com.confinement.diconfinement;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.text.SpannableString;
 
@@ -152,8 +155,7 @@ class FileUtils  {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static ArrayList<SpannableString> retrieveSavedWords(Context context) {
-        ArrayList<SpannableString> savedWordsListSorted = new ArrayList<>();
+    static ArrayList<String> retrieveSavedWords(Context context) {
         ArrayList<String> savedWordsString = new ArrayList<>();
 
         FileInputStream savedWordsInptStrm;
@@ -161,22 +163,21 @@ class FileUtils  {
             savedWordsInptStrm = context.openFileInput(Globals.savedWordsFileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return savedWordsListSorted;
+            return savedWordsString;
         }
         if (savedWordsInptStrm == null) {
-            return savedWordsListSorted;
+            return savedWordsString;
         }
 
         InputStreamReader savedWrdsInptStrmRdr =
                 new InputStreamReader(savedWordsInptStrm, StandardCharsets.UTF_8);
         try (BufferedReader savedWordsReader = new BufferedReader(savedWrdsInptStrmRdr)) {
             readSavedWordsList(savedWordsString, savedWordsReader);
-            SortAndConvertToSpannableList(savedWordsListSorted, savedWordsString);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return savedWordsListSorted;
+        return savedWordsString;
     }
 
     private static void readSavedWordsList(ArrayList<String> savedWordsString, BufferedReader reader) throws IOException {
@@ -188,7 +189,8 @@ class FileUtils  {
         }
     }
 
-    private static void SortAndConvertToSpannableList(ArrayList<SpannableString> savedWordsList, ArrayList<String> savedWordsString) {
+    static ArrayList<SpannableString> sortAndConvertToSpannableList(ArrayList<String> savedWordsString) {
+        ArrayList<SpannableString> savedWordsList = new ArrayList<>();
         if (savedWordsString.size() != 0) {
             Collections.sort(savedWordsString, new Comparator<String>() {
                 @Override
@@ -202,6 +204,7 @@ class FileUtils  {
                 savedWordsList.add(new SpannableString(word));
             }
         }
+        return savedWordsList;
     }
 
     static void initFirstWordDicoHashMap(Context applicationContext) {
@@ -237,4 +240,23 @@ class FileUtils  {
 
         }
     }
+
+    static Intent createSearchIntent(SpannableString savedWord, int position) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEARCH);
+        intent.putExtra(SearchManager.QUERY,savedWord.toString());
+        intent.setComponent(new ComponentName(Globals.packageName, Globals.packageName + ".SearchResultsActivity"));
+        intent.putExtra("position", position);
+        return intent;
+    }
+
+    static String normalizeString(String stringToNormalize) {
+        if (stringToNormalize != null) {
+            return stringToNormalize.toLowerCase();
+        }
+        return null;
+    }
+
+
+
 }
