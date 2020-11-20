@@ -8,39 +8,35 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.List;
 
 public class SearchResultsActivity extends AppCompatActivity {
 
     private String searchedWord;
     private Menu searchResultsMenu;
     private boolean needsSave;
-
     private Menu menu;
+    private Integer position;
+    private List<SpannableString> definitions;
+
+    public List<SpannableString> getDefinitions() {
+        return definitions;
+    }
+
+    public void setDefinitions(List<SpannableString> definitions) {
+        this.definitions = definitions;
+    }
 
     public Menu getMenu() {
         return menu;
@@ -48,37 +44,6 @@ public class SearchResultsActivity extends AppCompatActivity {
 
     public void setMenu(Menu menu) {
         this.menu = menu;
-    }
-    private String packageName = "com.confinement.diconfinement";
-
-    static Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
-        boolean previousDefinitionsFound = false;
-        for (int i = 0; i<definitionsNumber; i++)
-        {
-            if(definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE)
-            {
-                final Element definition = (Element) definitionsList.item(i);
-
-                String wordOfDictionnary = definition.getAttribute(FileUtils.wordAttribute);
-
-                if (wordOfDictionnary != null && wordOfDictionnary.equalsIgnoreCase(userQuery)){
-                    previousDefinitionsFound = true;
-                    String def = definition.getElementsByTagName(Globals.defXml).item(0).getTextContent();
-                    String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
-                    String[] stringArray = def.split("\n");
-                    list.add(new SpannableString(Html.fromHtml(nature)));
-                    Pattern p = Pattern.compile(Globals.regexpPattern);
-                    for (int cpt=0; cpt<stringArray.length; cpt++) {
-                        Matcher m = p.matcher(stringArray[cpt]);
-                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
-                        list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
-                    }
-                } else if (!wordOfDictionnary.equalsIgnoreCase(userQuery) && previousDefinitionsFound){
-                    return true;
-                }
-            }
-        }
-        return null;
     }
 
     private String getSearchedWord() {
@@ -88,6 +53,23 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void setSearchedWord(String word) {
         this.searchedWord = word;
     }
+
+    private void setPosition(Integer position) {
+        this.position = position;
+    }
+
+    private Integer getPosition() {
+        return this.position;
+    }
+
+    private boolean getNeedsSave() {
+        return this.needsSave;
+    }
+    private void setNeedsSave(boolean needsSave) {
+        this.needsSave=needsSave;
+    }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -190,6 +172,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void removeWordFromSavedList(File filesDir) {
         String wordToRemove = getSearchedWord();
         FileUtils.removeFromFile(filesDir, wordToRemove);
+        SharedPref.removeWordFromSharedPref(wordToRemove, getApplicationContext());
         DisplayUtils.displayToast(getApplicationContext(), Globals.wordUnsaved);
         setNeedsSave(true);
         setIconAlpha(true);
@@ -198,10 +181,12 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void addWordToSavedList(File filesDir, String wordToSave) {
         FileUtils.writeToFile(filesDir, wordToSave);
+        SharedPref.addWordToSharedPref(wordToSave, getApplicationContext(), getDefinitions());
         DisplayUtils.displayToast(getApplicationContext(), Globals.wordSaved);
         setNeedsSave(false);
         setIconAlpha(false);
     }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -211,7 +196,8 @@ public class SearchResultsActivity extends AppCompatActivity {
     private ArrayList<SpannableString> handleIntent(Intent intent) {
         ArrayList<SpannableString> list = new ArrayList<>();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            if (hasDefinitions(intent, list)) return list;
+            String userQuery = intent.getStringExtra(SearchManager.QUERY);
+            if (DefinitionsFinder.hasDefinitions(getResources(),userQuery, list)) return list;
         }
         list.add(new SpannableString(Globals.userQueryNotInDict));
         return list;
@@ -221,16 +207,39 @@ public class SearchResultsActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.searchable_activity);
-        ListView listView = findViewById(R.id.view_list);
-        ArrayList<SpannableString> definition = handleIntent(getIntent());
+        final ListView listView = findViewById(R.id.view_list);
+        String searchedWord = null;
+        setSearchedWord("");
+        if (getIntent() != null){
+            searchedWord = getIntent().getStringExtra(SearchManager.QUERY);
+            setTitle(searchedWord);
+            setSearchedWord(searchedWord);
+        }
+        //Check if word is not already stored in shared preferences. If not search in dictionnnary.
+        ArrayList<SpannableString> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), searchedWord);
+        if (definition == null) {
+            definition = handleIntent(getIntent());
+        }
+
+        setPosition(getIntent().getIntExtra("position", 0));
         ArrayAdapter adapter = new ArrayAdapter<>(this,
                 R.layout.textview, definition);
-        setSearchedWord("");
-        if (getIntent() != null) {
-            setTitle(getIntent().getStringExtra(SearchManager.QUERY));
-            setSearchedWord(getIntent().getStringExtra(SearchManager.QUERY));
-        }
+        setDefinitions(definition);
         listView.setAdapter(adapter);
+        listView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onSwipeLeft() {
+                goToNextOrPreviousDef(listView, getPosition() + 1);
+
+            }
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onSwipeRight() {
+                goToNextOrPreviousDef(listView, getPosition() - 1);
+            }
+        });
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setNavigationIcon(R.drawable.ic_back);
@@ -242,41 +251,16 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
     }
 
-     boolean hasDefinitions(Intent intent, ArrayList<SpannableString> list) {
-        String userQuery = intent.getStringExtra(SearchManager.QUERY);
-        if (userQuery == null || userQuery.isEmpty()) {
-            return false;
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void goToNextOrPreviousDef(ListView listView, int wordIndex) {
+        String previousSavedWord = DefinitionsFinder.getNextOrPreviousSavedWord(wordIndex, getApplicationContext());
+        if (previousSavedWord != null) {
+            setPosition(wordIndex);
+            setTitle(previousSavedWord);
+            ArrayList<SpannableString> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), previousSavedWord);
+            ArrayAdapter adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.textview, definition);
+            listView.setAdapter(adapter);
         }
-        userQuery = userQuery.toLowerCase();
-        Integer file = FileUtils.filetoSearch(userQuery);
-         if (file != null) {
-             InputStream is = getResources().openRawResource(file);
-             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-             DocumentBuilder db;
-             Document dictionnaryXml;
-             try {
-                 db = dbf.newDocumentBuilder();
-                 dictionnaryXml = db.parse(is);
-             } catch (Exception e) {
-                 e.printStackTrace();
-                 return false;
-             }
-             final Element dictionnaryRacine = dictionnaryXml.getDocumentElement();
-             final NodeList definitionsList = dictionnaryRacine.getChildNodes();
-             final int definitionsNumber = definitionsList.getLength();
-
-             Boolean definitionsAdded = addDefinitionsToList(list, userQuery, definitionsList, definitionsNumber);
-             if (definitionsAdded != null) return definitionsAdded;
-         }
-        return false;
     }
-
-    private boolean getNeedsSave() {
-        return this.needsSave;
-    }
-    private void setNeedsSave(boolean needsSave) {
-        this.needsSave=needsSave;
-    }
-
 }
 

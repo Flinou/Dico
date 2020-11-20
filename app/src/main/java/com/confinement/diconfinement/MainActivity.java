@@ -1,7 +1,6 @@
 package com.confinement.diconfinement;
 
 import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
                 SpannableString savedWord = (SpannableString) obj;
                 if (savedWord != null) {
-                    Intent intent = createSearchIntent(savedWord);
+                    Intent intent = FileUtils.createSearchIntent(savedWord, position);
                     startActivity(intent);
                 }
             }
@@ -76,7 +75,10 @@ public class MainActivity extends AppCompatActivity {
                         displaySpinner(toolbar, listView, progressBar);
                     }
                 });
-                FileUtils.initFirstWordDicoHashMap(getApplicationContext());
+                Context context = getApplicationContext();
+                FileUtils.initFirstWordDicoHashMap(context);
+                //Method to put in sharedPref saved words which are not in it (Only possible if words saved before version < 3.0)
+                SharedPref.putSavedWordsInSharedPref(getResources(),context, FileUtils.retrieveSavedWords(context));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
+
 
 
     private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, ListView listView) {
@@ -109,13 +112,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private Intent createSearchIntent(SpannableString savedWord) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEARCH);
-        intent.putExtra(SearchManager.QUERY,savedWord.toString());
-        intent.setComponent(new ComponentName(Globals.packageName, Globals.packageName + ".SearchResultsActivity"));
-        return intent;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -130,8 +126,9 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void displaySavedWords(ListView listView) {
-        ArrayList<SpannableString> savedWords = FileUtils.retrieveSavedWords(getApplicationContext());
-        listView.setAdapter(new WordsSavedAdapter(this, savedWords));
+        ArrayList<String> savedWords = FileUtils.retrieveSavedWords(getApplicationContext());
+        ArrayList<SpannableString> savedWordsSorted = FileUtils.sortAndConvertToSpannableList(savedWords);
+        listView.setAdapter(new WordsSavedAdapter(this, savedWordsSorted));
     }
 
     @Override

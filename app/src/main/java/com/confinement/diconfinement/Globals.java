@@ -1,6 +1,10 @@
 package com.confinement.diconfinement;
+import android.text.SpannableString;
+
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeSet;
 
 public class Globals extends AppCompatActivity {
@@ -12,11 +16,9 @@ public class Globals extends AppCompatActivity {
     static final String defXml = "def";
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
-
+    static final String preferenceFile = "preferenceFile";
     static final Integer suggestionsMaxLength = 3;
-
     static String savedWordsFileName = "savedWords";
-
     static String packageName = "com.confinement.diconfinement";
     static TreeSet<String> getDicoWords(InputStream is) {
         if (dicoWords == null) {
