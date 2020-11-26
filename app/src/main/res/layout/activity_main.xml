@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:id="@+id/rootlayout"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="top"
     tools:context=".MainActivity" >
 
 
@@ -13,39 +14,36 @@
         android:id="@+id/appbar"
         layout="@layout/toolbar"/>
 
-        <ProgressBar
-            android:id="@+id/pBar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            android:progress="0" />
-    <TextView
-    android:id="@+id/loadingTextView"
-    android:text="@string/loading"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignLeft="@+id/pBar"
-    android:layout_below="@+id/pBar" />
+    <ProgressBar
+        android:id="@+id/pBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:progress="0" />
 
     <TextView
-        android:id="@+id/vosmots"
-        android:layout_width="match_parent"
+        android:id="@+id/loadingTextView"
+        android:text="@string/loading"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dip"
-        android:text="@string/vos_mots"
-        android:textSize="20dip">
-    </TextView>
+        android:layout_alignLeft="@+id/pBar"
+        android:layout_below="@+id/pBar" />
 
 
-    <ListView
-        android:id="@+id/savedWords_list"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
+        android:name="com.confinement.diconfinement.WordsSavedFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:background="@drawable/border" >
-    </ListView>
+        app:menu="@menu/bottom_navigation_menu" />
 
 </LinearLayout>

@@ -8,4 +8,7 @@
     <string name="def_act_label" >Définition</string>
     <string name="hint" >Recherche dans le dico</string>
     <string name="searchable_label">Recherche</string>
+
+    <string name="text_label_1">Votre liste</string>
+    <string name="text_label_2">Jeu du diconfinement</string>
 </resources>

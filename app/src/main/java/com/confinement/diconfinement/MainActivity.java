@@ -3,15 +3,11 @@ package com.confinement.diconfinement;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.SpannableString;
 import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -20,16 +16,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
 
     protected static final String columnSuggestion = "wordSuggestion";
     protected static final Integer suggestionNumbers = 3;
-    Integer index, top;
     private Menu menu;
-    ListView listView = null;
 
     public Menu getMenu() {
         return menu;
@@ -44,27 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
-        listView = findViewById(R.id.savedWords_list);
         setSupportActionBar(toolbar);
-
-        displaySavedWords(listView);
         final ImageView imageView = findViewById(R.id.logo);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object obj = listView.getItemAtPosition(position);
-                //Save list index and top when exiting activity
-                index = listView.getFirstVisiblePosition();
-                View v = listView.getChildAt(0);
-                top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
-                SpannableString savedWord = (SpannableString) obj;
-                if (savedWord != null) {
-                    Intent intent = FileUtils.createSearchIntent(savedWord, position);
-                    startActivity(intent);
-                }
-            }
-        });
         final ProgressBar progressBar = findViewById(R.id.pBar);
 
         new Thread(new Runnable() {
@@ -72,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        displaySpinner(toolbar, listView, progressBar);
+                        displaySpinner(toolbar, progressBar);
                     }
                 });
                 Context context = getApplicationContext();
@@ -82,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        hideSpinner(progressBar, toolbar, listView);
+                        hideSpinner(progressBar, toolbar);
                     }
                 });
             }
@@ -91,21 +65,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, ListView listView) {
+    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar) {
         progressBar.setVisibility(View.GONE);
         TextView loadingText = findViewById(R.id.loadingTextView);
         loadingText.setVisibility(View.GONE);
         toolbar.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
-        TextView textV =findViewById(R.id.vosmots);
-        textV.setVisibility(View.VISIBLE);
     }
 
-    private void displaySpinner(Toolbar toolbar, ListView listView, ProgressBar progressBar) {
+    private void displaySpinner(Toolbar toolbar, ProgressBar progressBar) {
         toolbar.setVisibility(View.GONE);
-        listView.setVisibility(View.GONE);
-        TextView textV = findViewById(R.id.vosmots);
-        textV.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         TextView loadingText = findViewById(R.id.loadingTextView);
         loadingText.setVisibility(View.VISIBLE);
@@ -116,19 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onResume() {
-        displaySavedWords((ListView) findViewById(R.id.savedWords_list));
-        //Set saved list position when returning to activity
-        if (index != null && top != null){
-            listView.setSelectionFromTop(index, top);
-        }
         super.onResume();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void displaySavedWords(ListView listView) {
-        ArrayList<String> savedWords = FileUtils.retrieveSavedWords(getApplicationContext());
-        ArrayList<SpannableString> savedWordsSorted = FileUtils.sortAndConvertToSpannableList(savedWords);
-        listView.setAdapter(new WordsSavedAdapter(this, savedWordsSorted));
     }
 
     @Override
