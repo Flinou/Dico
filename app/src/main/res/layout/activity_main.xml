@@ -18,26 +18,20 @@
         android:id="@+id/pBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:indeterminate="true"
         android:progress="0" />
 
-    <TextView
-        android:id="@+id/loadingTextView"
-        android:text="@string/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/pBar"
-        android:layout_below="@+id/pBar" />
-
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
-        android:name="com.confinement.diconfinement.WordsSavedFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:id="@+id/fragment_main_activity"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"/>
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
