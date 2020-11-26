@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 public class Globals extends AppCompatActivity {
+    static final int gameWordsNumber = 5;
+    static final int gameWordsMinSize = 4;
     static TreeSet<String> dicoWords = null;
+    static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";
     static final String wordUnsaved = "Mot retiré de votre liste";
     static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
@@ -20,13 +23,27 @@ public class Globals extends AppCompatActivity {
     static final Integer suggestionsMaxLength = 3;
     static String savedWordsFileName = "savedWords";
     static String packageName = "com.confinement.diconfinement";
+    static ArrayList<SpannableString> gameWordsSelection = null;
     static TreeSet<String> getDicoWords(InputStream is) {
         if (dicoWords == null) {
-            dicoWords = FileUtils.populateDicoWords(is);
+            FileUtils.populateDicoWords(is);
         }
-        return dicoWords;
+        return Globals.dicoWords;
+    }
+    static void setGameWords(HashMap<Integer, String> gameWords){
+        Globals.gameWords = gameWords;
+    }
+    static HashMap<Integer, String> getGameWords(InputStream is) {
+        if (gameWords == null) {
+            FileUtils.populateDicoWords(is);
+        }
+        return Globals.gameWords;
+    }
+    public static void setDicoWords(TreeSet<String> wordsListSet) {
+        Globals.dicoWords = wordsListSet;
     }
 
-
-
+    public static void setGameWordsSelection(ArrayList<SpannableString> gameWordsSelection) {
+        Globals.gameWordsSelection = gameWordsSelection;
+    }
 }

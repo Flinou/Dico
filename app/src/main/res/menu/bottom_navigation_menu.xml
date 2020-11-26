@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/saved_words_fragment"
+        android:icon="@drawable/ic_saved_words"
+        android:title="@string/words_list"/>
+    <item
+        android:id="@+id/game_diconfinement_fragment"
+        android:icon="@drawable/ic_game"
+        android:title="@string/diconfinement_game"/>
+</menu>
