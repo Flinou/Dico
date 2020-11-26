@@ -16,8 +16,6 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 public class WordsSavedFragment extends Fragment {
-
-
     Integer index, top;
     ListView listView = null;
     public WordsSavedFragment() {
@@ -48,7 +46,6 @@ public class WordsSavedFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onResume() {
-         displaySavedWords((ListView) getActivity().findViewById(R.id.savedWords_list));
          //Set saved list position when returning to activity
          if (index != null && top != null){
             listView.setSelectionFromTop(index, top);

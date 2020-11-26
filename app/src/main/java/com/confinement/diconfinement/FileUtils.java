@@ -25,6 +25,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeSet;
@@ -92,18 +93,25 @@ class FileUtils  {
         return true;
     }
 
-    static TreeSet<String> populateDicoWords(InputStream is) {
+    static void populateDicoWords(InputStream is) {
         TreeSet<String> wordsListSet = new TreeSet<>();
+        HashMap<Integer, String> gameWords = new HashMap<>();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        int index = 0;
         try {
             while (reader.ready()) {
                 String currentLine = reader.readLine();
                 wordsListSet.add(currentLine);
+                if (currentLine.length() > Globals.gameWordsMinSize) {
+                    gameWords.put(index, currentLine);
+                    index++;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return wordsListSet;
+        Globals.setGameWords(gameWords);
+        Globals.setDicoWords(wordsListSet);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

@@ -9,6 +9,8 @@
     <string name="hint" >Recherche dans le dico</string>
     <string name="searchable_label">Recherche</string>
 
-    <string name="text_label_1">Votre liste</string>
-    <string name="text_label_2">Jeu du diconfinement</string>
+    <string name="words_list">Votre liste</string>
+    <string name="diconfinement_game">Jeu du diconfinement</string>
+    <string name="selection"><h3><i><b>La sélection</b></i></h3></string>
+    <string name="tirage">Nouveau tirage</string>
 </resources>

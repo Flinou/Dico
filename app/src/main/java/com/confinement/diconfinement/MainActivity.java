@@ -10,12 +10,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.TextView;
-
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
         final ImageView imageView = findViewById(R.id.logo);
         final ProgressBar progressBar = findViewById(R.id.pBar);
 
+        //Enable navigation between fragments with bottomNavigationView
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.fragment_main_activity);
+        NavController navController = navHostFragment.getNavController();
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        NavigationUI.setupWithNavController(bottomNav, navController);
+
+
         new Thread(new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {
@@ -53,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 FileUtils.initFirstWordDicoHashMap(context);
                 //Method to put in sharedPref saved words which are not in it (Only possible if words saved before version < 3.0)
                 SharedPref.putSavedWordsInSharedPref(getResources(),context, FileUtils.retrieveSavedWords(context));
+                //populate dicoWords for suggestions and game
+                Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -67,16 +80,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void hideSpinner(ProgressBar progressBar, Toolbar toolbar) {
         progressBar.setVisibility(View.GONE);
-        TextView loadingText = findViewById(R.id.loadingTextView);
-        loadingText.setVisibility(View.GONE);
         toolbar.setVisibility(View.VISIBLE);
     }
 
     private void displaySpinner(Toolbar toolbar, ProgressBar progressBar) {
         toolbar.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        TextView loadingText = findViewById(R.id.loadingTextView);
-        loadingText.setVisibility(View.VISIBLE);
     }
 
 
