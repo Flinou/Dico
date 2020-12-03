@@ -50,6 +50,7 @@ public class WordsSavedFragment extends Fragment {
          if (index != null && top != null){
             listView.setSelectionFromTop(index, top);
          }
+        displaySavedWords(listView);
         super.onResume();
     }
 
