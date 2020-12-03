@@ -26,15 +26,7 @@ public class DisplayUtils {
         return source.subSequence(0, i+1);
     }
 
-     static void removeUnwantedCharacters(String[] stringArray, int cpt, Matcher m) {
-        if (m.matches()){
-            if (m.group(1) != null) {
-                stringArray[cpt] = stringArray[cpt].replace(m.group(1), "<br><i>");
-            }
-            if (m.group(2) != null) {
-                stringArray[cpt] = stringArray[cpt].replace(m.group(2), "</i>");
-            }
-        }
+     static void removeUnwantedCharacters(String[] stringArray, int cpt) {
         stringArray[cpt] = stringArray[cpt].replace(";:", "");
         stringArray[cpt] = stringArray[cpt].replace("<li>", "");
         stringArray[cpt] = stringArray[cpt].replace("</li>", "");

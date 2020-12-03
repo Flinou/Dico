@@ -41,11 +41,14 @@ public class DefinitionsFinder {
                     String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
                     String[] stringArray = def.split("\n");
                     list.add(new SpannableString(Html.fromHtml(nature)));
-                    Pattern p = Pattern.compile(Globals.regexpPattern);
                     for (int cpt=0; cpt<stringArray.length; cpt++) {
-                        Matcher m = p.matcher(stringArray[cpt]);
-                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt, m);
+                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt);
                         list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
+                    }
+                    if (definition.getElementsByTagName(Globals.synXml) != null && definition.getElementsByTagName(Globals.synXml).item(0) != null) {
+                        String synonyme = definition.getElementsByTagName(Globals.synXml).item(0).getTextContent();
+                        list.add(new SpannableString(Html.fromHtml("<b>Synonymes :</b>")));
+                        list.add(new SpannableString(Html.fromHtml(synonyme)));
                     }
                 } else if (!wordOfDictionnary.equalsIgnoreCase(userQuery) && previousDefinitionsFound){
                     return true;
