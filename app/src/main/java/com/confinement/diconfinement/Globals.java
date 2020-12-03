@@ -17,6 +17,7 @@ public class Globals extends AppCompatActivity {
     static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     static final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
     static final String defXml = "def";
+    static final String synXml = "syn";
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
     static final String preferenceFile = "preferenceFile";
