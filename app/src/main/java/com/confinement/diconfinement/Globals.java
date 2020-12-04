@@ -10,6 +10,7 @@ import java.util.TreeSet;
 public class Globals extends AppCompatActivity {
     static final int gameWordsNumber = 5;
     static final int gameWordsMinSize = 4;
+    public static String needsClear = "needsClear";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";

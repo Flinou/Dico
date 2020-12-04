@@ -2,10 +2,13 @@ package com.confinement.diconfinement;
 
 import android.content.Context;
 import android.database.MatrixCursor;
+import android.text.Html;
+import android.text.SpannableString;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 public class DisplayUtils {
@@ -26,10 +29,11 @@ public class DisplayUtils {
         return source.subSequence(0, i+1);
     }
 
-     static void removeUnwantedCharacters(String[] stringArray, int cpt) {
-        stringArray[cpt] = stringArray[cpt].replace(";:", "");
-        stringArray[cpt] = stringArray[cpt].replace("<li>", "");
-        stringArray[cpt] = stringArray[cpt].replace("</li>", "");
+     static String removeUnwantedCharacters(String string) {
+        string = string.replace(";:", "");
+        string = string.replace("<li>", "");
+        string = string.replace("</li>", "");
+        return string;
     }
 
 
@@ -45,5 +49,14 @@ public class DisplayUtils {
     static void hideSearchBar(SearchView search) {
         search.setQuery("", false);
         search.setIconified(true);
+    }
+
+    public static List<SpannableString> createSpannableFromString(ArrayList<String> definition) {
+        List<SpannableString> spanStrings = new ArrayList<>();
+        for (String defPart : definition){
+            defPart = DisplayUtils.removeUnwantedCharacters(defPart);
+            spanStrings.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(defPart))));
+        }
+        return spanStrings;
     }
 }

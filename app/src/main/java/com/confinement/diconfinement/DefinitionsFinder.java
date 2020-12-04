@@ -25,7 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class DefinitionsFinder {
 
-    static Boolean addDefinitionsToList(ArrayList<SpannableString> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
+    static Boolean addDefinitionsToList(ArrayList<String> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
         boolean previousDefinitionsFound = false;
         for (int i = 0; i<definitionsNumber; i++)
         {
@@ -40,15 +40,14 @@ public class DefinitionsFinder {
                     String def = definition.getElementsByTagName(Globals.defXml).item(0).getTextContent();
                     String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
                     String[] stringArray = def.split("\n");
-                    list.add(new SpannableString(Html.fromHtml(nature)));
+                    list.add(nature);
                     for (int cpt=0; cpt<stringArray.length; cpt++) {
-                        DisplayUtils.removeUnwantedCharacters(stringArray, cpt);
-                        list.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(stringArray[cpt]))));
+                        list.add(stringArray[cpt]);
                     }
                     if (definition.getElementsByTagName(Globals.synXml) != null && definition.getElementsByTagName(Globals.synXml).item(0) != null) {
                         String synonyme = definition.getElementsByTagName(Globals.synXml).item(0).getTextContent();
-                        list.add(new SpannableString(Html.fromHtml("<b>Synonymes :</b>")));
-                        list.add(new SpannableString(Html.fromHtml(synonyme)));
+                        list.add("<b>Synonymes :</b>");
+                        list.add(synonyme);
                     }
                 } else if (!wordOfDictionnary.equalsIgnoreCase(userQuery) && previousDefinitionsFound){
                     return true;
@@ -58,7 +57,7 @@ public class DefinitionsFinder {
         return false;
     }
 
-    static boolean hasDefinitions(Resources resources, String userQuery, ArrayList<SpannableString> list) {
+    static boolean hasDefinitions(Resources resources, String userQuery, ArrayList<String> list) {
         if (userQuery == null || userQuery.isEmpty()) {
             return false;
         }
@@ -86,13 +85,13 @@ public class DefinitionsFinder {
         return false;
     }
 
-    static ArrayList<SpannableString> getSharedPrefDefinition(Context context, String searchedWord) {
+    static ArrayList<String> getSharedPrefDefinition(Context context, String searchedWord) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         String serializedObject = sharedPreferences.getString(FileUtils.normalizeString(searchedWord), null);
-        ArrayList<SpannableString> definition = null, defPref = null;
+        ArrayList<String> definition = null, defPref = null;
         if (serializedObject != null) {
             Gson gsonBis = new Gson();
-            Type type = new TypeToken<List<SpannableString>>(){}.getType();
+            Type type = new TypeToken<List<String>>(){}.getType();
             defPref = gsonBis.fromJson(serializedObject, type);
             definition = new ArrayList<>(defPref);
         }

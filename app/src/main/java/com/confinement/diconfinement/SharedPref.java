@@ -3,7 +3,6 @@ package com.confinement.diconfinement;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.text.SpannableString;
 
 import com.google.gson.Gson;
 
@@ -13,7 +12,7 @@ import java.util.List;
 //Class handling saved words putting them into SharedPreferences
 public class SharedPref {
 
-     static void addWordToSharedPref(String wordToSave, Context context, List<SpannableString> definitions) {
+     static void addWordToSharedPref(String wordToSave, Context context, List<String> definitions) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -29,12 +28,13 @@ public class SharedPref {
         editor.commit();
     }
 
-    //Method to put in sharedPref word saved by user before version 3.0
-    static void putSavedWordsInSharedPref(Resources resources, Context applicationContext, ArrayList<String> wordsList) {
-        SharedPreferences sharedPreferences = applicationContext.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+    //Method to clear and put in sharedPref word saved by user before version 3.0
+    static void resetSharedPref(Resources resources, Context applicationContext, ArrayList<String> wordsList, SharedPreferences sharedPreferences) {
+        sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().putInt(Globals.needsClear, 1).commit();
         for (String savedWrd : wordsList) {
             if ( sharedPreferences.getString(FileUtils.normalizeString(savedWrd), null) == null ) {
-                ArrayList<SpannableString> definitions = new ArrayList<>();
+                ArrayList<String> definitions = new ArrayList<>();
                 DefinitionsFinder.hasDefinitions(resources, savedWrd, definitions);
                 addWordToSharedPref(savedWrd, applicationContext, definitions);
             }
