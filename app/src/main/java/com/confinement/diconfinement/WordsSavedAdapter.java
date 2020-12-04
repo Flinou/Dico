@@ -41,7 +41,9 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             public void onClick(View view) {
                 File filesDir = context.getFilesDir();
-                FileUtils.removeFromFile(filesDir, objects.get(position).toString());
+                String wordToRemove = objects.get(position).toString();
+                FileUtils.removeFromFile(filesDir, wordToRemove);
+                SharedPref.removeWordFromSharedPref(wordToRemove, getContext());
                 objects.remove(objects.get(position));
                 wsa.notifyDataSetChanged();
                 DisplayUtils.displayToast(context, Globals.wordUnsaved);

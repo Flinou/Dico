@@ -10,6 +10,7 @@ import java.util.TreeSet;
 public class Globals extends AppCompatActivity {
     static final int gameWordsNumber = 5;
     static final int gameWordsMinSize = 4;
+    public static String needsClear = "needsClear";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";
@@ -17,6 +18,7 @@ public class Globals extends AppCompatActivity {
     static final String regexpPattern = "^.*(<span class=\"ExempleDefinition\">).*(</span>).*$";
     static final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
     static final String defXml = "def";
+    static final String synXml = "syn";
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
     static final String preferenceFile = "preferenceFile";

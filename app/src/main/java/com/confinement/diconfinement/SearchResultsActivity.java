@@ -28,13 +28,13 @@ public class SearchResultsActivity extends AppCompatActivity {
     private boolean needsSave;
     private Menu menu;
     private Integer position;
-    private List<SpannableString> definitions;
+    private List<String> definitions;
 
-    public List<SpannableString> getDefinitions() {
+    public List<String> getDefinitions() {
         return definitions;
     }
 
-    public void setDefinitions(List<SpannableString> definitions) {
+    public void setDefinitions(List<String> definitions) {
         this.definitions = definitions;
     }
 
@@ -193,13 +193,13 @@ public class SearchResultsActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
-    private ArrayList<SpannableString> handleIntent(Intent intent) {
-        ArrayList<SpannableString> list = new ArrayList<>();
+    private ArrayList<String> handleIntent(Intent intent) {
+        ArrayList<String> list = new ArrayList<>();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String userQuery = intent.getStringExtra(SearchManager.QUERY);
             if (DefinitionsFinder.hasDefinitions(getResources(),userQuery, list)) return list;
         }
-        list.add(new SpannableString(Globals.userQueryNotInDict));
+        list.add(Globals.userQueryNotInDict);
         return list;
     }
 
@@ -216,14 +216,15 @@ public class SearchResultsActivity extends AppCompatActivity {
             setSearchedWord(searchedWord);
         }
         //Check if word is not already stored in shared preferences. If not search in dictionnnary.
-        ArrayList<SpannableString> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), searchedWord);
+        ArrayList<String> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), searchedWord);
         if (definition == null) {
             definition = handleIntent(getIntent());
         }
 
         setPosition(getIntent().getIntExtra("position", 0));
+        List<SpannableString> definitionsSpannable = DisplayUtils.createSpannableFromString(definition);
         ArrayAdapter adapter = new ArrayAdapter<>(this,
-                R.layout.textview, definition);
+                R.layout.textview, definitionsSpannable);
         setDefinitions(definition);
         listView.setAdapter(adapter);
         listView.setOnTouchListener(new OnSwipeTouchListener(this) {
@@ -257,8 +258,9 @@ public class SearchResultsActivity extends AppCompatActivity {
         if (previousSavedWord != null) {
             setPosition(wordIndex);
             setTitle(previousSavedWord);
-            ArrayList<SpannableString> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), previousSavedWord);
-            ArrayAdapter adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.textview, definition);
+            ArrayList<String> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), previousSavedWord);
+            List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(definition);
+            ArrayAdapter adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.textview, definitionSpan);
             listView.setAdapter(adapter);
         }
     }

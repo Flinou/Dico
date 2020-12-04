@@ -3,6 +3,7 @@ package com.confinement.diconfinement;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -62,8 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 });
                 Context context = getApplicationContext();
                 FileUtils.initFirstWordDicoHashMap(context);
-                //Method to put in sharedPref saved words which are not in it (Only possible if words saved before version < 3.0)
-                SharedPref.putSavedWordsInSharedPref(getResources(),context, FileUtils.retrieveSavedWords(context));
+                //Necessary because of changes in sharedPreferences structure
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+                if (sharedPreferences.getInt(Globals.needsClear, 0) == 0) {
+                    SharedPref.resetSharedPref(getResources(), context, FileUtils.retrieveSavedWords(context), sharedPreferences);
+                }
                 //populate dicoWords for suggestions and game
                 Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
                 runOnUiThread(new Runnable() {
