@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 
 import static com.confinement.diconfinement.FileUtils.populateDicoWords;
@@ -18,6 +20,7 @@ public class FileUtilsTest {
     private static String guereAccentTest = "guère";
     private static String batimentAccentTest = "bâtiment";
     private static String maisAccentTest = "maïs";
+    private static String accentedESuggestionTest = "rêverie";
 
     private static String smallword = "a";
     private static String smallwordTwo = "le";
@@ -27,7 +30,7 @@ public class FileUtilsTest {
     @Before
     public void initResources() {
         is = this.getClass().getClassLoader().getResourceAsStream("dico.txt");
-        dicoWords = populateDicoWords(is);
+        dicoWords = Globals.getDicoWords(is);
     }
 
     @Test
@@ -73,6 +76,14 @@ public class FileUtilsTest {
         ArrayList<String> suggestions = FileUtils.retrieveSuggestions(dicoWords, searchedWord);
         assertTrue(wordToFind + " has not been found in suggestions with : " + searchedWord, suggestions.contains(wordToFind));
         is.close();
+    }
+
+    @Test
+    public void createdAccentedListTest() {
+        ArrayList<String> accentedWritingsList = FileUtils.createAccentedWritings(accentedESuggestionTest);
+        List<String> expectedResult =  Arrays.asList("reverie","réverie","rèverie","rêverie","revérie","revèrie","revêrie","révérie","révèrie","révêrie","rèvérie","rèvèrie","rèvêrie","rêvérie","rêvèrie","rêvêrie","reverié","reveriè","reveriê","réverié","réveriè","réveriê","rèverié","rèveriè","rèveriê","rêverié","rêveriè","rêveriê","revérié","revériè","revériê","revèrié","revèriè","revèriê","revêrié","revêriè","revêriê","révérié","révériè","révériê","révèrié","révèriè","révèriê","révêrié","révêriè","révêriê","rèvérié","rèvériè","rèvériê","rèvèrié","rèvèriè","rèvèriê","rèvêrié","rèvêriè","rèvêriê","rêvérié","rêvériè","rêvériê","rêvèrié","rêvèriè","rêvèriê","rêvêrié","rêvêriè","rêvêriê");
+        assertTrue(accentedWritingsList.equals(expectedResult));
+
     }
 
     @Test
