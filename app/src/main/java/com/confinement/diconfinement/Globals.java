@@ -21,8 +21,12 @@ public class Globals extends AppCompatActivity {
     static final String synXml = "syn";
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
+    static final String selection = "La sélection";
+    static final String saved_words = "Mots enregistrés";
     static final String preferenceFile = "preferenceFile";
     static final Integer suggestionsMaxLength = 3;
+    static final String gameName = "Le jeu du Diconfinement";
+    static final String gameExplanations = "5 mots ?\nVous en choisissez un.\nVos amis doivent ensuite en deviner le sens ou en faire la définition la plus drôle possible.\nVous choisissez l'heureux vainqueur qui prendra votre rôle au tour suivant.\nEffectivement, c'est pas fou comme jeu mais on manquait de budget." ;
     static String savedWordsFileName = "savedWords";
     static String packageName = "com.confinement.diconfinement";
     static ArrayList<SpannableString> gameWordsSelection = null;
@@ -32,9 +36,11 @@ public class Globals extends AppCompatActivity {
         }
         return Globals.dicoWords;
     }
+
     static void setGameWords(HashMap<Integer, String> gameWords){
         Globals.gameWords = gameWords;
     }
+    //Game words are words from dico whose size is > 4
     static HashMap<Integer, String> getGameWords(InputStream is) {
         if (gameWords == null) {
             FileUtils.populateDicoWords(is);

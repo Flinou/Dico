@@ -6,22 +6,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center">
-    <TextView
-        android:id="@+id/vosmotsbis"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dip"
-        android:text="@string/vos_mots"
-        android:textSize="20dip">
-    </TextView>
+
 
 
     <ListView
         android:id="@+id/savedWords_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border">
+        android:background="@color/colorDarkWhite">
     </ListView>
 
 

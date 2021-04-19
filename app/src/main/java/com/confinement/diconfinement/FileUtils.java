@@ -31,15 +31,16 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
-class FileUtils  {
+class FileUtils {
 
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
     static final String wordAttribute = "val";
     private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<String, Integer>();
 
 
-    static Integer filetoSearch(String query){
+    static Integer filetoSearch(String query) {
         final Collator instance = Collator.getInstance();
         instance.setStrength(Collator.FULL_DECOMPOSITION);
         List<String> wordDicoKeys = new ArrayList<String>(wordDicoHashMap.keySet());
@@ -118,17 +119,67 @@ class FileUtils  {
     static ArrayList<String> retrieveSuggestions(TreeSet<String> dictioSet, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
         if (wordToComplete != null && wordToComplete.length() >= Globals.suggestionsMaxLength) {
-            dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE);
             int size = 0;
-            for (String suggestion : dictioSet.subSet(wordToComplete, wordToComplete + Character.MAX_VALUE)) {
-                if (size == MainActivity.suggestionNumbers) {
-                    break;
+            ArrayList<String> accentedQueryList = createAccentedWritings(wordToComplete);
+            for (String accentedQuery : accentedQueryList) {
+                for (String suggestion : dictioSet.subSet(accentedQuery, accentedQuery + Character.MAX_VALUE)) {
+                    suggestions.add(suggestion);
+                    size++;
+                    if (size == MainActivity.suggestionNumbers) {
+                        return suggestions;
+                    }
                 }
-                suggestions.add(suggestion);
-                size++;
             }
         }
         return suggestions;
+    }
+
+    /**
+     * In order to retrieve suggestions, e in query are replaced by accented e like é, è and ê
+     * Resulting list is compounded by all spellings with accented e
+     * Ex: vert => [vert, vért, vèrt, vêrt]
+     *
+     * @param userQuery
+     * @return
+     */
+    static ArrayList<String> createAccentedWritings(String userQuery) {
+        ArrayList<String> accentedSpellingsPossibleList = new ArrayList<>();
+        ArrayList<String> accentedSpellingsPossibleListDraft = new ArrayList<>();
+
+        userQuery = removeAccent(userQuery);
+        //Retrieve first e position in user query
+        int firstE = userQuery.indexOf('e');
+        accentedSpellingsPossibleList.add(userQuery);
+        //Count number of e in word
+        int count = StringUtils.countMatches(userQuery, "e");
+        //For each e in word, we add all accented spellings in list of possible spellings starting by first e occurence
+        for (int i = 1; i <= count; i++) {
+            if (i > 1) {
+                firstE = firstE + userQuery.substring(firstE + 1).indexOf('e') + 1;
+            }
+            for (String mot : accentedSpellingsPossibleList) {
+                accentedSpellingsPossibleListDraft.addAll(replaceCharEAtIndex(firstE, mot));
+            }
+            accentedSpellingsPossibleList.addAll(accentedSpellingsPossibleListDraft);
+            accentedSpellingsPossibleListDraft.clear();
+        }
+        return accentedSpellingsPossibleList;
+    }
+
+    private static String removeAccent(String userQuery) {
+        userQuery = userQuery.replace('ê', 'e');
+        userQuery = userQuery.replace('é', 'e');
+        userQuery = userQuery.replace('è', 'e');
+        return userQuery;
+
+    }
+
+    static ArrayList<String> replaceCharEAtIndex(int index, String wordToChange){
+        ArrayList<String> allAccentedSpellingsPossible = new ArrayList<>();
+        allAccentedSpellingsPossible.add(wordToChange.substring(0, index) + 'é' + wordToChange.substring(index + 1));
+        allAccentedSpellingsPossible.add(wordToChange.substring(0, index) + 'è' + wordToChange.substring(index + 1));
+        allAccentedSpellingsPossible.add(wordToChange.substring(0, index) + 'ê' + wordToChange.substring(index + 1));
+        return allAccentedSpellingsPossible;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

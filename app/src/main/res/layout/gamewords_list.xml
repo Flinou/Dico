@@ -6,22 +6,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center">
-    <TextView
-        android:id="@+id/selection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dip"
-        android:text="@string/selection"
-        android:textSize="20dip">
-    </TextView>
 
 
     <ListView
         android:id="@+id/gamewords_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border">
+        android:background="@color/colorDarkWhite">
     </ListView>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -29,8 +20,10 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
+        android:padding="6dip"
         android:textColor="@color/colorWhite"
-        android:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/rounded_corners"
+        android:fontFamily="sans-serif-condensed"
         android:text="@string/tirage" />
 
 

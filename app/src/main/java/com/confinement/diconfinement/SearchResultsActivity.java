@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -209,6 +212,10 @@ public class SearchResultsActivity extends AppCompatActivity {
         setContentView(R.layout.searchable_activity);
         final ListView listView = findViewById(R.id.view_list);
         String searchedWord = null;
+
+        TextView wordsSavedTitle = findViewById(R.id.fragment_title);
+        wordsSavedTitle.setVisibility(View.INVISIBLE);
+        wordsSavedTitle.setHeight(0);
         setSearchedWord("");
         if (getIntent() != null){
             searchedWord = getIntent().getStringExtra(SearchManager.QUERY);

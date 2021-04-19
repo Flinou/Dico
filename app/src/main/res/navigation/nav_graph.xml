@@ -18,7 +18,7 @@
     <fragment android:id="@+id/game_diconfinement_fragment"
         android:label="@string/diconfinement_game"
 
-        android:name="com.confinement.diconfinement.DiconfinementGameFragment" >
+        android:name="com.confinement.diconfinement.GameWordsFragment" >
         <action
             android:id="@+id/action_game_diconfinement_to_saved_words_fragment"
             app:destination="@id/saved_words_fragment" />
