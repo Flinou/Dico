@@ -6,13 +6,14 @@
     android:id="@+id/rootlayout"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorDarkWhite"
     android:gravity="top"
     tools:context=".MainActivity" >
 
 
     <include
-        android:id="@+id/appbar"
-        layout="@layout/toolbar"/>
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar_layout"/>
 
     <ProgressBar
         android:id="@+id/pBar"
@@ -38,6 +39,7 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorDarkWhite"
         app:menu="@menu/bottom_navigation_menu" />
 
 </LinearLayout>

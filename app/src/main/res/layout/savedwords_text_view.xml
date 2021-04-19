@@ -10,9 +10,10 @@
         android:id="@+id/savedwordstextview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
         android:layout_weight="1"
-        android:padding="15dip"
-        android:textSize="16dip" >
+        android:padding="10dip"
+        android:textSize="17dip" >
     </TextView>
 
     <ImageView
