@@ -1,11 +1,15 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.text.Html;
 import android.text.SpannableString;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,5 +62,11 @@ public class DisplayUtils {
             spanStrings.add(new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml(defPart))));
         }
         return spanStrings;
+    }
+
+    static void changeFragmentTitle(FragmentActivity activity, String newTitle, Resources resources) {
+        TextView wordsSavedTitle = activity.findViewById(R.id.fragment_title);
+        wordsSavedTitle.setText(newTitle);
+        wordsSavedTitle.setTextColor(resources.getColor(R.color.colorWhite));
     }
 }

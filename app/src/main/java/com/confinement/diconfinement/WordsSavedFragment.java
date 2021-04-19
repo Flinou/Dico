@@ -2,16 +2,20 @@ package com.confinement.diconfinement;
 
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
 
@@ -50,9 +54,15 @@ public class WordsSavedFragment extends Fragment {
          if (index != null && top != null){
             listView.setSelectionFromTop(index, top);
          }
+        DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getActivity().getResources());
         displaySavedWords(listView);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.help) != null) {
+            toolbar.getMenu().findItem(R.id.help).setVisible(false);
+        }
         super.onResume();
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void displaySavedWords(ListView listView) {

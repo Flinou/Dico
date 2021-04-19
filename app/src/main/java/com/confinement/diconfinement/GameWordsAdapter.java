@@ -28,7 +28,7 @@ public class GameWordsAdapter extends ArrayAdapter<SpannableString> {
 
         final GameWordsAdapter wsa = this;
         View rowView = inflater.inflate(R.layout.gamewords_text_view, parent, false);
-        TextView textView = rowView.findViewById(R.id.savedwordstextview);
+        TextView textView = rowView.findViewById(R.id.gamewordstextview);
         textView.setText(objects.get(position));
 
         return rowView;
