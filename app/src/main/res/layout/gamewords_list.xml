@@ -7,13 +7,10 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <include
+        layout="@layout/listview"
+        android:id="@+id/gamewords_list"/>
 
-    <ListView
-        android:id="@+id/gamewords_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorDarkWhite">
-    </ListView>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/tirage_button"

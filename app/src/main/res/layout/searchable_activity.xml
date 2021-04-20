@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SearchResultsActivity" >
+    tools:context=".SearchResultsActivity"
+    android:background="@color/colorDarkWhite">
 
     <include
         layout="@layout/toolbar"/>
-    <ListView
-        android:id="@+id/view_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+
+    <include
+        layout="@layout/listview"
+        android:id="@+id/view_list"/>
 
 </LinearLayout>
 

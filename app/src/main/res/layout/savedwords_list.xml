@@ -7,14 +7,7 @@
     android:orientation="vertical"
     android:gravity="center">
 
-
-
-    <ListView
-        android:id="@+id/savedWords_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorDarkWhite">
-    </ListView>
-
-
+    <include
+        layout="@layout/listview"
+        android:id="@+id/savedWords_list"/>
 </LinearLayout>
