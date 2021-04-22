@@ -1,5 +1,7 @@
 package com.confinement.diconfinement;
 
+import android.content.Context;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
-
-import static com.confinement.diconfinement.FileUtils.populateDicoWords;
 import static org.junit.Assert.assertTrue;
 
 public class FileUtilsTest {
@@ -87,10 +87,12 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void removeFromFile() {
+    public void removeFromFileTest() {
     }
 
     @Test
-    public void retrieveSavedWords() {
+    public void retrieveSavedWordsTest() {
     }
+
+
 }
