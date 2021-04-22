@@ -12,7 +12,6 @@ import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -196,7 +195,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         handleIntent(intent);
     }
 
-    private ArrayList<String> handleIntent(Intent intent) {
+    ArrayList<String> handleIntent(Intent intent) {
         ArrayList<String> list = new ArrayList<>();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String userQuery = intent.getStringExtra(SearchManager.QUERY);
@@ -214,8 +213,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         String searchedWord = null;
 
         TextView wordsSavedTitle = findViewById(R.id.fragment_title);
-        wordsSavedTitle.setVisibility(View.INVISIBLE);
-        wordsSavedTitle.setHeight(0);
+        wordsSavedTitle.setVisibility(View.GONE);
         setSearchedWord("");
         if (getIntent() != null){
             searchedWord = getIntent().getStringExtra(SearchManager.QUERY);
@@ -230,23 +228,8 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         setPosition(getIntent().getIntExtra("position", 0));
         List<SpannableString> definitionsSpannable = DisplayUtils.createSpannableFromString(definition);
-        ArrayAdapter adapter = new ArrayAdapter<>(this,
-                R.layout.textview, definitionsSpannable);
         setDefinitions(definition);
-        listView.setAdapter(adapter);
-        listView.setOnTouchListener(new OnSwipeTouchListener(this) {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onSwipeLeft() {
-                goToNextOrPreviousDef(listView, getPosition() + 1);
-
-            }
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onSwipeRight() {
-                goToNextOrPreviousDef(listView, getPosition() - 1);
-            }
-        });
+        listView.setAdapter(new WordDayAdapter(getApplicationContext(), definitionsSpannable));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -256,19 +239,6 @@ public class SearchResultsActivity extends AppCompatActivity {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(false);
             }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void goToNextOrPreviousDef(ListView listView, int wordIndex) {
-        String previousSavedWord = DefinitionsFinder.getNextOrPreviousSavedWord(wordIndex, getApplicationContext());
-        if (previousSavedWord != null) {
-            setPosition(wordIndex);
-            setTitle(previousSavedWord);
-            ArrayList<String> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), previousSavedWord);
-            List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(definition);
-            ArrayAdapter adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.textview, definitionSpan);
-            listView.setAdapter(adapter);
         }
     }
 }
