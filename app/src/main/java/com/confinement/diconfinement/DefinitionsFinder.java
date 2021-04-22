@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
-import android.text.Html;
 import android.text.SpannableString;
 
 import androidx.annotation.RequiresApi;
@@ -18,8 +17,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -54,7 +52,12 @@ public class DefinitionsFinder {
                 }
             }
         }
-        return false;
+        //handle case of last word in dico file (example : audioconférence)
+        if (previousDefinitionsFound) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     static boolean hasDefinitions(Resources resources, String userQuery, ArrayList<String> list) {
