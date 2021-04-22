@@ -22,6 +22,7 @@ public class Globals extends AppCompatActivity {
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
     static final String selection = "La sélection";
+    static final String wordOfTheDayTitle = "Le mot du jour";
     static final String saved_words = "Mots enregistrés";
     static final String preferenceFile = "preferenceFile";
     static final Integer suggestionsMaxLength = 3;

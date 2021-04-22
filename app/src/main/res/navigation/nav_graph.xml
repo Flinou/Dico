@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_saved_words_fragment_to_game_diconfinement"
             app:destination="@id/game_diconfinement_fragment" />
+        <action
+            android:id="@+id/action_saved_words_fragment_to_wordday_fragment2"
+            app:destination="@id/wordday_fragment" />
     </fragment>
 
 
@@ -22,6 +25,21 @@
         <action
             android:id="@+id/action_game_diconfinement_to_saved_words_fragment"
             app:destination="@id/saved_words_fragment" />
+        <action
+            android:id="@+id/action_game_diconfinement_fragment_to_wordday_fragment2"
+            app:destination="@id/wordday_fragment" />
+    </fragment>
+
+    <fragment android:id="@+id/wordday_fragment"
+        android:label="@string/wordday"
+
+        android:name="com.confinement.diconfinement.WordDayFragment" >
+        <action
+            android:id="@+id/action_wordday_fragment_to_saved_words_fragment"
+            app:destination="@id/saved_words_fragment" />
+        <action
+            android:id="@+id/action_wordday_fragment_to_game_diconfinement_fragment2"
+            app:destination="@id/game_diconfinement_fragment" />
     </fragment>
 
 </navigation>

@@ -10,7 +10,8 @@
     <string name="searchable_label">Recherche</string>
 
     <string name="words_list">Votre liste</string>
-    <string name="diconfinement_game">Jeu du diconfinement</string>
+    <string name="diconfinement_game">Jeu du dico</string>
+    <string name="wordday">Mot du jour</string>
     <string name="selection"><h3><i><b>La sélection</b></i></h3></string>
     <string name="tirage">Nouveau tirage</string>
 </resources>

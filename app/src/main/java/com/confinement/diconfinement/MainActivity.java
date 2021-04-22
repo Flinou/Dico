@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final ImageView imageView = findViewById(R.id.logo);
         final ProgressBar progressBar = findViewById(R.id.pBar);
-
+        final TextView fragmentTitle = findViewById(R.id.fragment_title);
         //Enable navigation between fragments with bottomNavigationView
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.fragment_main_activity);
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        displaySpinner(toolbar, progressBar);
+                        displaySpinner(toolbar, progressBar, fragmentTitle);
                     }
                 });
                 Context context = getApplicationContext();
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        hideSpinner(progressBar, toolbar);
+                        hideSpinner(progressBar, toolbar, fragmentTitle);
                     }
                 });
             }
@@ -90,14 +91,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar) {
+    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, TextView fragmentTitle) {
         progressBar.setVisibility(View.GONE);
         toolbar.setVisibility(View.VISIBLE);
+        fragmentTitle.setVisibility(View.VISIBLE);
     }
 
-    private void displaySpinner(Toolbar toolbar, ProgressBar progressBar) {
+    private void displaySpinner(Toolbar toolbar, ProgressBar progressBar, TextView fragmentTitle) {
         toolbar.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        fragmentTitle.setVisibility(View.GONE);
     }
 
 
