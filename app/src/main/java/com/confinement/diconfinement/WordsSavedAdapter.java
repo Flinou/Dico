@@ -43,7 +43,7 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
                 File filesDir = context.getFilesDir();
                 String wordToRemove = objects.get(position).toString();
                 FileUtils.removeFromFile(filesDir, wordToRemove);
-                SharedPref.removeWordFromSharedPref(wordToRemove, getContext());
+                SharedPrefUtils.removeWordFromSharedPref(wordToRemove, getContext());
                 objects.remove(objects.get(position));
                 wsa.notifyDataSetChanged();
                 DisplayUtils.displayToast(context, Globals.wordUnsaved);

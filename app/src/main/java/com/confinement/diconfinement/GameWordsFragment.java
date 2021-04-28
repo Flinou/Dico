@@ -37,13 +37,9 @@ public class GameWordsFragment extends Fragment {
     public void onResume() {
         listView = getActivity().findViewById(R.id.gamewords_list);
         Button button = getActivity().findViewById(R.id.tirage_button);
-
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.help) == null) {
-            addGameHelpButtonInToolBar(toolbar, getContext());
-        }
         DisplayUtils.changeFragmentTitle(getActivity(), Globals.selection, getContext().getResources());
-        toolbar.getMenu().findItem(R.id.help).setVisible(true);
+        DisplayUtils.displayHelpMenu(getActivity());
+        DisplayUtils.hideAddMenu(getActivity());
         if (Globals.gameWordsSelection == null) {
             generateGameWords(listView);
         } else {
@@ -66,34 +62,6 @@ public class GameWordsFragment extends Fragment {
             }
         });
         super.onResume();
-    }
-
-    private void addGameHelpButtonInToolBar(Toolbar toolbar, Context applicationContext) {
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.help: {
-                        new AlertDialog.Builder(applicationContext)
-                                .setTitle(Globals.gameName)
-                                .setMessage(Globals.gameExplanations)
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                })
-                                .setIcon(android.R.drawable.ic_menu_help)
-                                .show();
-                        return true;
-                    }
-                    default:
-                        return false;
-                }
-            }
-
-        });
-
-        toolbar.inflateMenu(R.menu.menu_game);
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)

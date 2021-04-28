@@ -5,13 +5,14 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ public class WordsSavedFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         listView = getActivity().findViewById(R.id.savedWords_list);
-        displaySavedWords(listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object obj = listView.getItemAtPosition(position);
@@ -49,17 +49,14 @@ public class WordsSavedFragment extends Fragment {
     public void onResume() {
         DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getActivity().getResources());
         displaySavedWords(listView);
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.help) != null) {
-            toolbar.getMenu().findItem(R.id.help).setVisible(false);
-        }
         //Set saved list position when returning to activity
         if (index != null && top != null){
             listView.setSelectionFromTop(index, top);
         }
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.hideAddMenu(getActivity());
         super.onResume();
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void displaySavedWords(ListView listView) {
