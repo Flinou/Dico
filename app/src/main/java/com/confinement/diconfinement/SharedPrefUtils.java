@@ -5,16 +5,18 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 //Class handling saved words putting them into SharedPreferences
-public class SharedPref {
+public class SharedPrefUtils {
 
      static void addWordToSharedPref(String wordToSave, Context context, List<String> definitions) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
@@ -45,7 +47,21 @@ public class SharedPref {
         }
     }
 
-    static void addWordOfTheDayToSharedPref(String wordToSave, Context context, List<String> definitions) {
+
+    static ArrayList<String> getSharedPrefDefinition(Context context, String searchedWord) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        String serializedObject = sharedPreferences.getString(searchedWord, null);
+        ArrayList<String> definition = null, defPref = null;
+        if (serializedObject != null) {
+            Gson gsonBis = new Gson();
+            Type type = new TypeToken<List<String>>(){}.getType();
+            defPref = gsonBis.fromJson(serializedObject, type);
+            definition = new ArrayList<>(defPref);
+        }
+        return definition;
+    }
+
+    static void addWordOfTheDayToSharedPref(Context context, List<String> definitions) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -88,6 +104,8 @@ public class SharedPref {
         editor.putInt(Globals.wordOfTheDayIndex, index);
         editor.commit();
     }
+
+
 }
 
 
