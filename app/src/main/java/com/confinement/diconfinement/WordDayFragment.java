@@ -1,6 +1,6 @@
 package com.confinement.diconfinement;
 
-import android.os.Build;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -8,46 +8,25 @@ import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WordDayFragment extends Fragment {
 
     ListView listView = null;
+    ArrayList<String> wordOfTheDayDef = null;
     public WordDayFragment() {super(R.layout.wordday_list);}
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+    public ArrayList<String> getWordOfTheDayDef() {
+        return wordOfTheDayDef;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    public void onResume() {
-        listView = getActivity().findViewById(R.id.wordday_list);
-        DisplayUtils.changeFragmentTitle(getActivity(), Globals.wordOfTheDayTitle, getContext().getResources());
-
-        TextView view = (TextView) getView().findViewById(R.id.textview);
-        String dayWord = "abattis";
-        ArrayList<String> definition = new ArrayList();
-        DefinitionsFinder.hasDefinitions(getResources(), dayWord, definition);
-        SpannableString dayWordSpan = new SpannableString(dayWord);
-        dayWordSpan.setSpan(new RelativeSizeSpan(1f), 0,dayWordSpan.length(), 0); // set size
-        SpannableString defSpan = new SpannableString("");
-        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(definition);
-        for (SpannableString definitionPart : definitionSpan) {
-            defSpan = new SpannableString(TextUtils.concat(defSpan, definitionPart));
-        }
-        listView.setAdapter(new WordDayAdapter(getContext(), definitionSpan));
-        super.onResume();
+    public void setWordOfTheDayDef(ArrayList<String> wordOfTheDayDef) {
+        this.wordOfTheDayDef = wordOfTheDayDef;
     }
 
     @Override
@@ -55,6 +34,49 @@ public class WordDayFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.displayAddMenu(getActivity());
+        listView = view.findViewById(R.id.wordday_list);
+        String wordOfTheDay = retrieveCurrentWordOfTheDay();
+        displayWordDefinition(wordOfTheDay);
         return view;
+    }
+
+    private String retrieveCurrentWordOfTheDay() {
+        String newDate = FileUtils.updateWordOfTheDayDate(getContext());
+        if (newDate != null) {
+            return newWordOfTheDay(newDate);
+        }
+        return getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
+    }
+
+    private String newWordOfTheDay(String date) {
+        SharedPrefUtils.updateWordOfTheDayDateInSharedPref(date, getContext());
+        int newWordDayIndex = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getInt(Globals.wordOfTheDayIndex, -1) + 1;
+        SharedPrefUtils.updateWordOfTheDayIndexInSharedPref(newWordDayIndex, getContext());
+        return SharedPrefUtils.updateWordOfTheDayInSharedPref(newWordDayIndex, getContext());
+    }
+
+    private void displayWordDefinition(String wordOfTheDay) {
+        DisplayUtils.changeFragmentTitle(getActivity(), wordOfTheDay, getContext().getResources());
+        List<SpannableString> definitionSpan = retrieveWordOfTheDayDefinition(wordOfTheDay);
+        listView.setAdapter(new WordDayAdapter(getContext(), definitionSpan));
+    }
+
+    private List<SpannableString> retrieveWordOfTheDayDefinition(String wordOfTheDay) {
+        if (getWordOfTheDayDef() == null) {
+            ArrayList<String> definition = new ArrayList<>();
+            DefinitionsFinder.hasDefinitions(getResources(), wordOfTheDay, definition);
+            setWordOfTheDayDef(definition);
+        }
+        SharedPrefUtils.addWordOfTheDayToSharedPref(getContext(), getWordOfTheDayDef());
+        SpannableString dayWordSpan = new SpannableString(wordOfTheDay);
+        dayWordSpan.setSpan(new RelativeSizeSpan(1f), 0,dayWordSpan.length(), 0);
+        SpannableString defSpan = new SpannableString("");
+        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(getWordOfTheDayDef());
+        for (SpannableString definitionPart : definitionSpan) {
+            defSpan = new SpannableString(TextUtils.concat(defSpan, definitionPart));
+        }
+        return definitionSpan;
     }
 }

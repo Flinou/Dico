@@ -4,6 +4,8 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableString;
 
@@ -21,8 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.Collator;
+import java.text.DateFormat;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -267,16 +272,15 @@ class FileUtils {
     }
 
     static void initFirstWordDicoHashMap(Context applicationContext) {
-        final String defPackage = "com.confinement.diconfinement";
         final String dicoIdentifierPattern = "dico";
         //Way to retrieve number of dictionary files in raw folder
         int dictionNumbers= R.raw.class.getFields().length;
 
         //length - 1 in loop because there is dico.txt file
-        for (int i=1; i<=dictionNumbers - 1; i++){
+        for (int i=1; i<=dictionNumbers - 2; i++){
             String dicoIdentifierString = dicoIdentifierPattern + i;
 
-            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", defPackage);
+            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", Globals.packageName);
             InputStream is = applicationContext.getResources().openRawResource(dictionaryId);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             try {
@@ -316,6 +320,48 @@ class FileUtils {
         return null;
     }
 
+    static BufferedReader openRawFile(String dayWordFileName, Context context) {
+        int dayWordId = context.getResources().getIdentifier(dayWordFileName,"raw", Globals.packageName);
+        InputStream is = context.getResources().openRawResource(dayWordId);
+        return new BufferedReader(new InputStreamReader(is));
+    }
+
+    static String updateWordOfTheDayDate(Context context) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = dateFormat.format(Calendar.getInstance().getTime());
+        String lastWordDayDate = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayDate, null);
+        if (lastWordDayDate == null || !lastWordDayDate.equalsIgnoreCase(date)) {
+            return date;
+        }
+        return null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void removeWordFromSavedList(File filesDir, Context context, String wordToRemove) {
+        FileUtils.removeFromFile(filesDir, wordToRemove);
+        SharedPrefUtils.removeWordFromSharedPref(wordToRemove, context);
+        DisplayUtils.displayToast(context, Globals.wordUnsaved);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void addWordToSavedList(File filesDir, String wordToSave, Context context, List<String> definitions) {
+        FileUtils.writeToFile(filesDir, wordToSave);
+        SharedPrefUtils.addWordToSharedPref(wordToSave, context, definitions);
+        DisplayUtils.displayToast(context, Globals.wordSaved);
+    }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static void handleSaveClick(String wordToSave, List<String> wordOfTheDayDef, Context context, Drawable icon) {
+        File filesDir = context.getFilesDir();
+        if (FileUtils.needsSave(context, wordToSave)) {
+            if (filesDir != null && wordToSave != null) {
+                FileUtils.addWordToSavedList(filesDir, wordToSave, context, wordOfTheDayDef);
+                DisplayUtils.setIconAlpha(false, icon);
+            }
+        } else {
+            FileUtils.removeWordFromSavedList(filesDir, context, wordToSave);
+            DisplayUtils.setIconAlpha(true, icon);
+        }
+    }
 }
