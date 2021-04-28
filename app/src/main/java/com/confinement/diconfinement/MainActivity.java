@@ -3,6 +3,7 @@ package com.confinement.diconfinement;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +26,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -75,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 //Necessary because of changes in sharedPreferences structure
                 SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
                 if (sharedPreferences.getInt(Globals.needsClear, 0) == 0) {
-                    SharedPref.resetSharedPref(getResources(), context, FileUtils.retrieveSavedWords(context), sharedPreferences);
+                    SharedPrefUtils.resetSharedPref(getResources(), context, FileUtils.retrieveSavedWords(context), sharedPreferences);
                 }
                 //populate dicoWords for suggestions and game
                 Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
@@ -152,8 +158,41 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        final Toolbar toolbar = findViewById(R.id.toolbar);
+        DisplayUtils.hideHelpMenu(this);
+        DisplayUtils.hideAddMenu(this);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.help_game: {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(Globals.gameName)
+                                .setMessage(Globals.gameExplanations)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_menu_help)
+                                .show();
+                        return true;
+                    }
+                    case R.id.add_word: {
+                        String wordToSave = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
+                        List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.wordOfTheDayDefinition);
+                        FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
+                    }
+                    default:
+                        return false;
+                }
+            }
+
+        });
         return true;
     }
+
 
 
 }

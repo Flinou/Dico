@@ -129,18 +129,10 @@ public class SearchResultsActivity extends AppCompatActivity {
         setSearchResultsMenu(menu);
         String wordToSave = getSearchedWord();
         boolean needsSave = FileUtils.needsSave(getApplicationContext(), wordToSave);
-        setIconAlpha(needsSave);
+        DisplayUtils.setIconAlpha(needsSave, getResources().getDrawable(R.drawable.ic_save));
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private void setIconAlpha(boolean needsSave) {
-        Drawable resIcon = getResources().getDrawable(R.drawable.ic_save);
-        if (needsSave) {
-            resIcon.setAlpha(255);
-        } else {
-            resIcon.setAlpha(50);
-        }
-    }
 
     private void setSearchResultsMenu(Menu menu) {
         this.searchResultsMenu = menu;
@@ -156,37 +148,15 @@ public class SearchResultsActivity extends AppCompatActivity {
                 finish(); // close this activity and return to preview activity (if there is any)
                 break;
             case R.id.action_save :
-                File filesDir = getApplicationContext().getFilesDir();
+                FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_save));
                 if (getNeedsSave()) {
-                    String wordToSave = getSearchedWord();
-                    if (filesDir != null && getSearchedWord() != null) {
-                        addWordToSavedList(filesDir, wordToSave);
-                    }
+                    setNeedsSave(false);
                 } else {
-                    removeWordFromSavedList(filesDir);
+                    setNeedsSave(true);
                 }
                 break;
             }
         return super.onOptionsItemSelected(item);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void removeWordFromSavedList(File filesDir) {
-        String wordToRemove = getSearchedWord();
-        FileUtils.removeFromFile(filesDir, wordToRemove);
-        SharedPref.removeWordFromSharedPref(wordToRemove, getApplicationContext());
-        DisplayUtils.displayToast(getApplicationContext(), Globals.wordUnsaved);
-        setNeedsSave(true);
-        setIconAlpha(true);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void addWordToSavedList(File filesDir, String wordToSave) {
-        FileUtils.writeToFile(filesDir, wordToSave);
-        SharedPref.addWordToSharedPref(wordToSave, getApplicationContext(), getDefinitions());
-        DisplayUtils.displayToast(getApplicationContext(), Globals.wordSaved);
-        setNeedsSave(false);
-        setIconAlpha(false);
     }
 
 
@@ -221,7 +191,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             setSearchedWord(searchedWord);
         }
         //Check if word is not already stored in shared preferences. If not search in dictionnnary.
-        ArrayList<String> definition = DefinitionsFinder.getSharedPrefDefinition(getApplicationContext(), searchedWord);
+        ArrayList<String> definition = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), FileUtils.normalizeString(searchedWord));
         if (definition == null) {
             definition = handleIntent(getIntent());
         }
