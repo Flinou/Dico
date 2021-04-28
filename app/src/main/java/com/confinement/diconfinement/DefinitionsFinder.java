@@ -88,18 +88,6 @@ public class DefinitionsFinder {
         return false;
     }
 
-    static ArrayList<String> getSharedPrefDefinition(Context context, String searchedWord) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
-        String serializedObject = sharedPreferences.getString(FileUtils.normalizeString(searchedWord), null);
-        ArrayList<String> definition = null, defPref = null;
-        if (serializedObject != null) {
-            Gson gsonBis = new Gson();
-            Type type = new TypeToken<List<String>>(){}.getType();
-            defPref = gsonBis.fromJson(serializedObject, type);
-            definition = new ArrayList<>(defPref);
-        }
-        return definition;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static String getNextOrPreviousSavedWord(int index, Context context) {
