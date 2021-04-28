@@ -3,12 +3,14 @@ package com.confinement.diconfinement;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.MatrixCursor;
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.SpannableString;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
@@ -68,5 +70,42 @@ public class DisplayUtils {
         TextView wordsSavedTitle = activity.findViewById(R.id.fragment_title);
         wordsSavedTitle.setText(newTitle);
         wordsSavedTitle.setTextColor(resources.getColor(R.color.colorWhite));
+    }
+
+    static void hideHelpMenu(FragmentActivity activity) {
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.help_game) != null) {
+            toolbar.getMenu().findItem(R.id.help_game).setVisible(false);
+        }
+    }
+
+
+    public static void displayHelpMenu(FragmentActivity activity) {
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.help_game) != null) {
+            toolbar.getMenu().findItem(R.id.help_game).setVisible(true);
+        }
+    }
+
+    static void hideAddMenu(FragmentActivity activity) {
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
+            toolbar.getMenu().findItem(R.id.add_word).setVisible(false);
+        }
+    }
+
+    static void displayAddMenu(FragmentActivity activity) {
+        Toolbar toolbar = activity.findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
+            toolbar.getMenu().findItem(R.id.add_word).setVisible(true);
+        }
+    }
+
+    static void setIconAlpha(boolean needsSave, Drawable icon) {
+        if (needsSave) {
+            icon.setAlpha(255);
+        } else {
+            icon.setAlpha(50);
+        }
     }
 }
