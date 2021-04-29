@@ -25,10 +25,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,12 +58,33 @@ public class MainActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.fragment_main_activity);
         NavController navController = navHostFragment.getNavController();
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        if (FileUtils.updateWordOfTheDayDate(getApplicationContext()) != null) {
+            BadgeDrawable badgeDrawable = bottomNav.getOrCreateBadge(R.id.wordday_fragment);
+        }
+        NavigationUI.setupWithNavController(bottomNav, navController);
         bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
             }
+
         });
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.wordday_fragment: {
+                        BadgeDrawable badgeDrawable = bottomNav.getBadge(R.id.wordday_fragment);
+                        if (badgeDrawable != null && badgeDrawable.isVisible()) {
+                                bottomNav.removeBadge(R.id.wordday_fragment);
+                        }
+                        return NavigationUI.onNavDestinationSelected(item, navController);
+                    }
+                    default:
+                        return NavigationUI.onNavDestinationSelected(item, navController);
+                }
+            }
+        });
+
 
 
         new Thread(new Runnable() {
