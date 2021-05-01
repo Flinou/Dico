@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -46,20 +44,21 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Context context = getApplicationContext();
+        setAlarmIfNeeded(context);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ImageView imageView = findViewById(R.id.logo);
-        final ProgressBar progressBar = findViewById(R.id.pBar);
+        final View loadingLayout = findViewById(R.id.loadingLayout);
         final TextView fragmentTitle = findViewById(R.id.fragment_title);
         //Enable navigation between fragments with bottomNavigationView
         FragmentManager supportFragmentManager = getSupportFragmentManager();
         NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.fragment_main_activity);
         NavController navController = navHostFragment.getNavController();
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        if (FileUtils.updateWordOfTheDayDate(getApplicationContext()) != null) {
-            BadgeDrawable badgeDrawable = bottomNav.getOrCreateBadge(R.id.wordday_fragment);
+        if (FileUtils.updateWordOfTheDayDate(context) != null) {
+            bottomNav.getOrCreateBadge(R.id.wordday_fragment);
         }
         NavigationUI.setupWithNavController(bottomNav, navController);
         bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        displaySpinner(toolbar, progressBar, fragmentTitle);
+                        DisplayUtils.displaySpinner(toolbar, fragmentTitle, loadingLayout);
                     }
                 });
                 Context context = getApplicationContext();
@@ -104,29 +103,30 @@ public class MainActivity extends AppCompatActivity {
                 }
                 //populate dicoWords for suggestions and game
                 Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        hideSpinner(progressBar, toolbar, fragmentTitle);
+                        DisplayUtils.hideSpinner(toolbar, fragmentTitle, loadingLayout);
                     }
                 });
             }
         }).start();
     }
 
-
-
-    private void hideSpinner(ProgressBar progressBar, Toolbar toolbar, TextView fragmentTitle) {
-        progressBar.setVisibility(View.GONE);
-        toolbar.setVisibility(View.VISIBLE);
-        fragmentTitle.setVisibility(View.VISIBLE);
+    private void setAlarmIfNeeded(Context context) {
+        if (!SharedPrefUtils.isAlarmSet(context)) {
+            AlarmService amService = new AlarmService(context);
+            amService.startAlarm();
+            SharedPrefUtils.setAlarmSharedPref(context);
+        }
     }
 
-    private void displaySpinner(Toolbar toolbar, ProgressBar progressBar, TextView fragmentTitle) {
-        toolbar.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-        fragmentTitle.setVisibility(View.GONE);
-    }
+
 
 
 
@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         setMenu(menu);
@@ -211,7 +210,4 @@ public class MainActivity extends AppCompatActivity {
         });
         return true;
     }
-
-
-
 }
