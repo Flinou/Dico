@@ -7,5 +7,7 @@ It contains a game, a list of your saved words and a word of the day.
 
 # Attributions
 All data in this application are provided by wiktionary :
+
 Source : https://dumps.wikimedia.org/frwiki/
+
 License : Creative Commons Attribution-Share-Alike 3.0 License
