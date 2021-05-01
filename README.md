@@ -2,7 +2,7 @@
 
 Diconfinement is a free, open source **french** dictionary allowing you to enrich your vocabulary. 
 Diconfinement is available as **📱 android** application.
-It contains a game, a list of your saved words and a word of the day.
+It not only contains a dictionary but also allows you to play a game, save as many words as you want and learn a new word daily.
 
 
 # Attributions
