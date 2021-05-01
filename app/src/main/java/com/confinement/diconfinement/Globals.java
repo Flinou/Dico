@@ -18,6 +18,11 @@ public class Globals extends AppCompatActivity {
     public static String wordOfTheDayDefinition = "wordDayDef";
     public static String alarm = "alarm";
     public static String lastNotificationDate = "lastNotificationDate";
+    public static String channel_id = "channel_id";
+    public static String channel_description = "Channel for new word of the dat notification";
+    public static CharSequence notification_content = "Il y a un nouveau mot du jour !";
+    public static CharSequence notification_title = "Scientia potentia est";
+    public static CharSequence channel_name = "Notif channel";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";
