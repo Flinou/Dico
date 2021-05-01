@@ -336,6 +336,12 @@ class FileUtils {
         return null;
     }
 
+    static String getDay() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String date = dateFormat.format(Calendar.getInstance().getTime());
+        return date;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeWordFromSavedList(File filesDir, Context context, String wordToRemove) {
         FileUtils.removeFromFile(filesDir, wordToRemove);
@@ -363,5 +369,12 @@ class FileUtils {
             FileUtils.removeWordFromSavedList(filesDir, context, wordToSave);
             DisplayUtils.setIconAlpha(true, icon);
         }
+    }
+
+    public static boolean needsNotification(Context context, String day) {
+        if (SharedPrefUtils.getLastNotificationDate(context).equals(day)){
+            return false;
+        }
+        return true;
     }
 }

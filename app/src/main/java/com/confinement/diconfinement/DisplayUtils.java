@@ -6,6 +6,7 @@ import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.SpannableString;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -107,5 +108,17 @@ public class DisplayUtils {
         } else {
             icon.setAlpha(50);
         }
+    }
+
+    static void hideSpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage) {
+        loadingImage.setVisibility(View.GONE);
+        toolbar.setVisibility(View.VISIBLE);
+        fragmentTitle.setVisibility(View.VISIBLE);
+    }
+
+    static void displaySpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage) {
+        toolbar.setVisibility(View.GONE);
+        loadingImage.setVisibility(View.VISIBLE);
+        fragmentTitle.setVisibility(View.GONE);
     }
 }

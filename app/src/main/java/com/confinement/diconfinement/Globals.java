@@ -16,6 +16,8 @@ public class Globals extends AppCompatActivity {
     public static String wordOfTheDayDate = "wordDaydate";
     public static String wordOfTheDayIndex = "wordDayIndex";
     public static String wordOfTheDayDefinition = "wordDayDef";
+    public static String alarm = "alarm";
+    public static String lastNotificationDate = "lastNotificationDate";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";

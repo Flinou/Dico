@@ -106,6 +106,27 @@ public class SharedPrefUtils {
     }
 
 
+    public static boolean isAlarmSet(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(Globals.alarm, false);
+    }
+    public static void setAlarmSharedPref(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(Globals.alarm, true);
+        editor.commit();
+    }
+
+    public static void updateLastNotificationDate(Context context, String date) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Globals.lastNotificationDate, date);
+    }
+
+    public static String getLastNotificationDate(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(Globals.lastNotificationDate, "");
+    }
 }
 
 
