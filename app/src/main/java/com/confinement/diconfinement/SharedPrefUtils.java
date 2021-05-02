@@ -121,6 +121,7 @@ public class SharedPrefUtils {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Globals.lastNotificationDate, date);
+        editor.commit();
     }
 
     public static String getLastNotificationDate(Context context) {
