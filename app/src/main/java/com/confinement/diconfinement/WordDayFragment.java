@@ -1,6 +1,7 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import java.lang.reflect.Array;
@@ -29,15 +32,17 @@ public class WordDayFragment extends Fragment {
         this.wordOfTheDayDef = wordOfTheDayDef;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
-        DisplayUtils.hideHelpMenu(getActivity());
-        DisplayUtils.displayAddMenu(getActivity());
-        listView = view.findViewById(R.id.wordday_list);
         String wordOfTheDay = retrieveCurrentWordOfTheDay();
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
+        DisplayUtils.displayAddMenu(getActivity(), wordOfTheDay);
+        listView = view.findViewById(R.id.wordday_list);
         displayWordDefinition(wordOfTheDay);
         return view;
     }

@@ -95,8 +95,9 @@ public class DisplayUtils {
         }
     }
 
-    static void displayAddMenu(FragmentActivity activity) {
+    static void displayAddMenu(FragmentActivity activity, String wordOfTheDay) {
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
+
         if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
             toolbar.getMenu().findItem(R.id.add_word).setVisible(true);
         }

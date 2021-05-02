@@ -5,7 +5,6 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +117,6 @@ public class SearchResultsActivity extends AppCompatActivity {
                 return true;
             }
         });
-        final MenuItem saveMenuItem = getMenu().findItem(R.id.action_save);
         return true;
     }
 
@@ -127,9 +124,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
         setSearchResultsMenu(menu);
-        String wordToSave = getSearchedWord();
-        boolean needsSave = FileUtils.needsSave(getApplicationContext(), wordToSave);
-        DisplayUtils.setIconAlpha(needsSave, getResources().getDrawable(R.drawable.ic_save));
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getApplicationContext(), getSearchedWord()), getResources().getDrawable(R.drawable.ic_addword));
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -148,7 +143,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 finish(); // close this activity and return to preview activity (if there is any)
                 break;
             case R.id.action_save :
-                FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_save));
+                FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
                 if (getNeedsSave()) {
                     setNeedsSave(false);
                 } else {
