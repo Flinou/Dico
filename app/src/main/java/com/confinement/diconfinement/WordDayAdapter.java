@@ -1,6 +1,8 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +33,9 @@ public class WordDayAdapter extends ArrayAdapter<SpannableString> {
         View rowView = inflater.inflate(R.layout.textview, parent, false);
         TextView textView = rowView.findViewById(R.id.textview);
         textView.setText(objects.get(position));
-
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            textView.setTextColor(Color.rgb(108, 108,108));
+        }
         return rowView;
     }
 }
