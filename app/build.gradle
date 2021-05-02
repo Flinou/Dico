@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.confinement.diconfinement"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
-        versionCode 13
-        versionName "7.0"
+        versionCode 14
+        versionName "Carglass"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
