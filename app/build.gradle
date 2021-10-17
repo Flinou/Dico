@@ -8,8 +8,8 @@ android {
         applicationId "com.confinement.diconfinement"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 14
-        versionName "Carglass"
+        versionCode 15
+        versionName "HubertDeLaBath"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
