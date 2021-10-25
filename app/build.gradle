@@ -9,7 +9,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 15
-        versionName "HubertDeLaBath"
+        versionName "7.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
