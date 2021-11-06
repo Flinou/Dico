@@ -4,14 +4,19 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,21 +26,23 @@ public class GameWordsFragment extends Fragment {
         super(R.layout.gamewords_list);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Nullable
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //return super.onCreateView(inflater, container, savedInstanceState);
+        // listView = getActivity().findViewById(R.id.gamewords_list);
+        return  inflater.inflate(R.layout.gamewords_list, container, false);
+
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void onResume() {
-        listView = getActivity().findViewById(R.id.gamewords_list);
-        Button button = getActivity().findViewById(R.id.tirage_button);
-        DisplayUtils.changeFragmentTitle(getActivity(), Globals.selection, getContext().getResources());
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        listView = view.findViewById(R.id.gamewords_list);
+        Button button = view.findViewById(R.id.tirage_button);
         DisplayUtils.displayHelpMenu(getActivity());
         DisplayUtils.hideAddMenu(getActivity());
         if (Globals.gameWordsSelection == null) {
-            generateGameWords(listView);
+            listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
         } else {
             listView.setAdapter(new GameWordsAdapter(getActivity(), Globals.gameWordsSelection));
         }
@@ -52,23 +59,19 @@ public class GameWordsFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                generateGameWords(listView);
+                listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
             }
         });
-        super.onResume();
+        super.onViewCreated(view, savedInstanceState);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void generateGameWords(ListView listView) {
-        ArrayList<SpannableString> wordsToDisplay = new ArrayList<>();
-        Integer size = Globals.getGameWords(getActivity().getResources().openRawResource(R.raw.dico)).size();
-        for (int i=0; i<Globals.gameWordsNumber; i++){
-            Random random  = new Random();
-            int randomIndex = random.nextInt(size);
-            wordsToDisplay.add(new SpannableString(Globals.getGameWords(getActivity().getResources().openRawResource(R.raw.dico)).get(randomIndex)));
-        }
-        Globals.setGameWordsSelection(wordsToDisplay);
-        listView.setAdapter(new GameWordsAdapter(getActivity(), wordsToDisplay));
+    @Override
+    public void onResume() {
+
+        DisplayUtils.changeFragmentTitle(getActivity(), Globals.selection, getContext().getResources());
+        super.onResume();
     }
 
 }

@@ -22,9 +22,16 @@ import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -52,46 +59,25 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final View loadingLayout = findViewById(R.id.loadingLayout);
         final TextView fragmentTitle = findViewById(R.id.fragment_title);
-        //Enable navigation between fragments with bottomNavigationView
         FragmentManager supportFragmentManager = getSupportFragmentManager();
-        NavHostFragment navHostFragment = (NavHostFragment) supportFragmentManager.findFragmentById(R.id.fragment_main_activity);
-        NavController navController = navHostFragment.getNavController();
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        if (FileUtils.updateWordOfTheDayDate(context) != null) {
-            bottomNav.getOrCreateBadge(R.id.wordday_fragment);
-        }
-        NavigationUI.setupWithNavController(bottomNav, navController);
-        bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
-            @Override
-            public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
-            }
-
-        });
-        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.wordday_fragment: {
-                        BadgeDrawable badgeDrawable = bottomNav.getBadge(R.id.wordday_fragment);
-                        if (badgeDrawable != null && badgeDrawable.isVisible()) {
-                                bottomNav.removeBadge(R.id.wordday_fragment);
-                        }
-                        return NavigationUI.onNavDestinationSelected(item, navController);
-                    }
-                    default:
-                        return NavigationUI.onNavDestinationSelected(item, navController);
-                }
-            }
-        });
 
 
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        ViewPager2 viewPager = findViewById(R.id.pager);
+        TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
+        viewPager.setAdapter(tabAdapter);
+        Globals.gameWordsSelection = FileUtils.generateGameWords(getResources().openRawResource(R.raw.dico));
+        List<String> tabTitles = Arrays.asList("Votre liste", "Jeu du Dico", "Mot du jour");
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(tabTitles.get(position))
+        ).attach();
 
         new Thread(new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DisplayUtils.displaySpinner(toolbar, fragmentTitle, loadingLayout);
+                        DisplayUtils.displaySpinner(toolbar, fragmentTitle, loadingLayout, tabLayout);
                     }
                 });
                 Context context = getApplicationContext();
@@ -111,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DisplayUtils.hideSpinner(toolbar, fragmentTitle, loadingLayout);
+                        DisplayUtils.hideSpinner(toolbar, fragmentTitle, loadingLayout, tabLayout);
                     }
                 });
             }
@@ -125,10 +111,6 @@ public class MainActivity extends AppCompatActivity {
             SharedPrefUtils.setAlarmSharedPref(context);
         }
     }
-
-
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -147,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
 
@@ -178,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
+
         DisplayUtils.hideHelpMenu(this);
         DisplayUtils.hideAddMenu(this);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

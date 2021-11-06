@@ -15,9 +15,13 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,5 +210,6 @@ public class SearchResultsActivity extends AppCompatActivity {
             }
         }
     }
+
 }
 

@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableString;
+import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
 
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -376,5 +378,18 @@ class FileUtils {
             return false;
         }
         return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    static ArrayList<SpannableString> generateGameWords(InputStream dicoWords) {
+        ArrayList<SpannableString> gameWords = new ArrayList<>();
+        Integer size = Globals.getGameWords(dicoWords).size();
+        for (int i=0; i<Globals.gameWordsNumber; i++){
+            Random random  = new Random();
+            int randomIndex = random.nextInt(size);
+            gameWords.add(new SpannableString(Globals.getGameWords(dicoWords).get(randomIndex)));
+        }
+        Globals.setGameWordsSelection(gameWords);
+        return gameWords;
     }
 }

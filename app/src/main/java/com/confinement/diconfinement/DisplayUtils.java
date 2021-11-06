@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.material.tabs.TabLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -95,7 +97,7 @@ public class DisplayUtils {
         }
     }
 
-    static void displayAddMenu(FragmentActivity activity, String wordOfTheDay) {
+    static void displayAddMenu(FragmentActivity activity) {
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
 
         if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
@@ -111,14 +113,16 @@ public class DisplayUtils {
         }
     }
 
-    static void hideSpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage) {
+    static void hideSpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage, TabLayout tabLayout) {
         loadingImage.setVisibility(View.GONE);
         toolbar.setVisibility(View.VISIBLE);
         fragmentTitle.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.VISIBLE);
     }
 
-    static void displaySpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage) {
+    static void displaySpinner(Toolbar toolbar, TextView fragmentTitle, View loadingImage, TabLayout tabLayout) {
         toolbar.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.GONE);
         loadingImage.setVisibility(View.VISIBLE);
         fragmentTitle.setVisibility(View.GONE);
     }

@@ -38,13 +38,18 @@ public class WordDayFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
-        String wordOfTheDay = retrieveCurrentWordOfTheDay();
-        DisplayUtils.hideHelpMenu(getActivity());
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
-        DisplayUtils.displayAddMenu(getActivity(), wordOfTheDay);
         listView = view.findViewById(R.id.wordday_list);
-        displayWordDefinition(wordOfTheDay);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        String wordOfTheDay = retrieveCurrentWordOfTheDay();
+        displayWordDefinition(wordOfTheDay);
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.displayAddMenu(getActivity());
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
+        super.onResume();
     }
 
     private String retrieveCurrentWordOfTheDay() {
