@@ -14,7 +14,6 @@ import android.widget.ListView;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,8 +74,7 @@ public class WordDayFragment extends Fragment {
 
     private List<SpannableString> retrieveWordOfTheDayDefinition(String wordOfTheDay) {
         if (getWordOfTheDayDef() == null) {
-            ArrayList<String> definition = new ArrayList<>();
-            DefinitionsFinder.hasDefinitions(getResources(), wordOfTheDay, definition);
+            ArrayList<String> definition = (ArrayList<String>) DefinitionsFinder.getDefinitions(getResources(), wordOfTheDay);
             setWordOfTheDayDef(definition);
         }
         SharedPrefUtils.addWordOfTheDayToSharedPref(getContext(), getWordOfTheDayDef());

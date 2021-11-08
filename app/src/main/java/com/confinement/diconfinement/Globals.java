@@ -29,6 +29,8 @@ public class Globals extends AppCompatActivity {
     static final String wordUnsaved = "Mot retiré de votre liste";
     static final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
     static final String defXml = "def";
+    static final String definitionXml = "definition";
+    static final String typeXml = "type";
     static final String synXml = "syn";
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";

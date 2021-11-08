@@ -15,12 +15,9 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,13 +162,14 @@ public class SearchResultsActivity extends AppCompatActivity {
     }
 
     ArrayList<String> handleIntent(Intent intent) {
-        ArrayList<String> list = new ArrayList<>();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String userQuery = intent.getStringExtra(SearchManager.QUERY);
-            if (DefinitionsFinder.hasDefinitions(getResources(),userQuery, list)) return list;
+            ArrayList<String> definToDisplay = (ArrayList<String>) DefinitionsFinder.getDefinitions(getResources(),userQuery);
+            if (definToDisplay != null) return definToDisplay;
         }
-        list.add(Globals.userQueryNotInDict);
-        return list;
+        ArrayList<String> definToDisplay = new ArrayList<>();
+        definToDisplay.add(Globals.userQueryNotInDict);
+        return definToDisplay;
     }
 
     @Override

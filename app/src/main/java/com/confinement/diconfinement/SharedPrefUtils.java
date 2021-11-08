@@ -9,8 +9,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +38,7 @@ public class SharedPrefUtils {
         sharedPreferences.edit().putInt(Globals.needsClear, 1).commit();
         for (String savedWrd : wordsList) {
             if ( sharedPreferences.getString(FileUtils.normalizeString(savedWrd), null) == null ) {
-                ArrayList<String> definitions = new ArrayList<>();
-                DefinitionsFinder.hasDefinitions(resources, savedWrd, definitions);
+                ArrayList<String> definitions = (ArrayList<String>) DefinitionsFinder.getDefinitions(resources, savedWrd);
                 addWordToSharedPref(savedWrd, applicationContext, definitions);
             }
         }

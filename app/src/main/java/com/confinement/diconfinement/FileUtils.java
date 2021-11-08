@@ -55,7 +55,7 @@ class FileUtils {
         Collections.reverse(wordDicoKeys);
         if (query != null) {
             for (String firstDef : wordDicoKeys) {
-                if (instance.compare(query, firstDef) > 0) {
+                if (instance.compare(query, firstDef) >= 0) {
                     return wordDicoHashMap.get(firstDef);
                 }
             }

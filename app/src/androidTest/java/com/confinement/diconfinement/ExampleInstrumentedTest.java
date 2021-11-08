@@ -44,7 +44,7 @@ public class ExampleInstrumentedTest {
             ArrayList<String> definitionList = new ArrayList<>();
             String dicoWord = reader.readLine();
             try {
-                assertTrue("Le mot" + dicoWord + "n'a pas de définition", DefinitionsFinder.hasDefinitions(appContext.getResources(), dicoWord, definitionList));
+                assertTrue("Le mot" + dicoWord + "n'a pas de définition", DefinitionsFinder.getDefinitions(appContext.getResources(), dicoWord, definitionList));
             } catch (AssertionError err) {
                 missingWords += dicoWord + "\n";
             }

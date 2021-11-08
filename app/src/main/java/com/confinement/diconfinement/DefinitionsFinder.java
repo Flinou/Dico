@@ -1,20 +1,13 @@
 package com.confinement.diconfinement;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.os.Build;
-import android.text.SpannableString;
 
-import androidx.annotation.RequiresApi;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.io.InputStream;
-import java.lang.reflect.Type;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,46 +16,50 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class DefinitionsFinder {
 
-    static Boolean addDefinitionsToList(ArrayList<String> list, String userQuery, NodeList definitionsList, int definitionsNumber) {
-        boolean previousDefinitionsFound = false;
-        for (int i = 0; i<definitionsNumber; i++)
-        {
-            if(definitionsList.item(i).getNodeType() == Node.ELEMENT_NODE)
-            {
-                final Element definition = (Element) definitionsList.item(i);
-
-                String wordOfDictionnary = definition.getAttribute(FileUtils.wordAttribute);
-
-                if (wordOfDictionnary != null && wordOfDictionnary.equalsIgnoreCase(userQuery)){
-                    previousDefinitionsFound = true;
-                    String def = definition.getElementsByTagName(Globals.defXml).item(0).getTextContent();
-                    String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
-                    String[] stringArray = def.split("\n");
-                    list.add(nature);
-                    for (int cpt=0; cpt<stringArray.length; cpt++) {
-                        list.add(stringArray[cpt]);
-                    }
-                    if (definition.getElementsByTagName(Globals.synXml) != null && definition.getElementsByTagName(Globals.synXml).item(0) != null) {
-                        String synonyme = definition.getElementsByTagName(Globals.synXml).item(0).getTextContent();
-                        list.add("<b>Synonymes :</b>");
-                        list.add(synonyme);
-                    }
-                } else if (!wordOfDictionnary.equalsIgnoreCase(userQuery) && previousDefinitionsFound){
-                    return true;
-                }
+    static List<String> retrieveDefInXml(String userQuery, NodeList definitionsList, int startIndex, int stopIndex) {
+        ArrayList<String> defToDisplay = new ArrayList<>();
+        Integer indexDichotomic = Math.round((startIndex + stopIndex) / 2);
+        if (definitionsList.item(indexDichotomic).getNodeType() == Node.ELEMENT_NODE) {
+            final Element definition = (Element) definitionsList.item(indexDichotomic);
+            String wordOfDictionnary = definition.getAttribute(FileUtils.wordAttribute);
+            final Collator instance = Collator.getInstance();
+            instance.setStrength(Collator.FULL_DECOMPOSITION);
+            if (startIndex == stopIndex && !wordOfDictionnary.equalsIgnoreCase(userQuery) || startIndex > stopIndex || stopIndex < startIndex) {
+                return null;
+            } else if (wordOfDictionnary != null && instance.compare(userQuery, wordOfDictionnary) > 0) {
+                return retrieveDefInXml( userQuery, definitionsList, indexDichotomic + 1, stopIndex);
+            } else if (wordOfDictionnary != null && instance.compare(userQuery, wordOfDictionnary) < 0) {
+                return retrieveDefInXml( userQuery, definitionsList, startIndex, indexDichotomic - 1);
+            } else if (wordOfDictionnary != null && wordOfDictionnary.equalsIgnoreCase(userQuery)) {
+                return writeDefinition(defToDisplay, definition);
             }
         }
-        //handle case of last word in dico file (example : audioconférence)
-        if (previousDefinitionsFound) {
-            return true;
-        } else {
-            return false;
-        }
+        return defToDisplay;
     }
 
-    static boolean hasDefinitions(Resources resources, String userQuery, ArrayList<String> list) {
+    private static List<String> writeDefinition(ArrayList<String> defToDisplay, Element definition) {
+        NodeList typeList = definition.getElementsByTagName(Globals.typeXml);
+        for (int i = 0; i<typeList.getLength(); i++) {
+            definition = (Element) typeList.item(i);
+            String def = definition.getElementsByTagName(Globals.defXml).item(0).getTextContent();
+            String nature = definition.getElementsByTagName(Globals.natureXml).item(0).getTextContent();
+            String[] stringArray = def.split("\n");
+            defToDisplay.add(nature);
+            for (int cpt = 0; cpt < stringArray.length; cpt++) {
+                defToDisplay.add(stringArray[cpt]);
+            }
+            if (definition.getElementsByTagName(Globals.synXml) != null && definition.getElementsByTagName(Globals.synXml).item(0) != null) {
+                String synonyme = definition.getElementsByTagName(Globals.synXml).item(0).getTextContent();
+                defToDisplay.add("<b>Synonymes :</b>");
+                defToDisplay.add(synonyme);
+            }
+        }
+        return defToDisplay;
+    }
+
+    static List<String> getDefinitions(Resources resources, String userQuery) {
         if (userQuery == null || userQuery.isEmpty()) {
-            return false;
+            return null;
         }
         userQuery = userQuery.toLowerCase();
         Integer file = FileUtils.filetoSearch(userQuery);
@@ -75,26 +72,12 @@ public class DefinitionsFinder {
                 db = dbf.newDocumentBuilder();
                 dictionnaryXml = db.parse(is);
             } catch (Exception e) {
-                e.printStackTrace();
-                return false;
+                return null;
             }
             final Element dictionnaryRacine = dictionnaryXml.getDocumentElement();
-            final NodeList definitionsList = dictionnaryRacine.getChildNodes();
-            final int definitionsNumber = definitionsList.getLength();
-
-            Boolean definitionsAdded = addDefinitionsToList(list, userQuery, definitionsList, definitionsNumber);
-            return definitionsAdded;
-        }
-        return false;
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static String getNextOrPreviousSavedWord(int index, Context context) {
-        ArrayList<String> savedWordsString = FileUtils.retrieveSavedWords(context);
-        if (index >= 0 && index < savedWordsString.size()) {
-            ArrayList<SpannableString> savedWords = FileUtils.sortAndConvertToSpannableList(savedWordsString);
-            return String.valueOf(savedWords.get(index));
+            final NodeList definitionsListBis = dictionnaryRacine.getElementsByTagName(Globals.definitionXml);
+            List<String> definitionsRetrieved = retrieveDefInXml(userQuery, definitionsListBis, 0, definitionsListBis.getLength() - 1);
+            return definitionsRetrieved;
         }
         return null;
     }
