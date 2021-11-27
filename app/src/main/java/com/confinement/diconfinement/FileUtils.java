@@ -4,11 +4,9 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.SpannableString;
-import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
 
@@ -23,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.Collator;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -34,10 +31,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import android.icu.text.Collator;
 import org.apache.commons.lang3.StringUtils;
 
 class FileUtils {
@@ -48,8 +47,9 @@ class FileUtils {
 
 
     static Integer filetoSearch(String query) {
-        final Collator instance = Collator.getInstance();
-        instance.setStrength(Collator.FULL_DECOMPOSITION);
+        final Collator instance = Collator.getInstance(Locale.FRENCH);
+        instance.setStrength(Collator.SECONDARY);
+        instance.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
         List<String> wordDicoKeys = new ArrayList<String>(wordDicoHashMap.keySet());
         //Reverse wordDicoKeys because it's simpler to compare user query browsing dictionary from the end to the beginning
         Collections.reverse(wordDicoKeys);
