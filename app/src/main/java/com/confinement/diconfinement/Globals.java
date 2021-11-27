@@ -23,6 +23,7 @@ public class Globals extends AppCompatActivity {
     public static CharSequence notification_content = "Il y a un nouveau mot du jour !";
     public static CharSequence notification_title = "Scientia potentia est";
     public static CharSequence channel_name = "Notif channel";
+    public static String game_words = "Jeu du dico";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";
@@ -36,7 +37,9 @@ public class Globals extends AppCompatActivity {
     static final String columnSuggestion = "wordSuggestion";
     static final String selection = "La sélection";
     static final String wordOfTheDayTitle = "Le mot du jour";
+    static final String wordOfTheDayTitle_fragment = "Mot du jour";
     static final String saved_words = "Mots enregistrés";
+    static final String saved_words_fragment = "Votre liste";
     static final String preferenceFile = "preferenceFile";
     static final Integer suggestionsMaxLength = 3;
     static final String gameName = "Le jeu du Diconfinement";

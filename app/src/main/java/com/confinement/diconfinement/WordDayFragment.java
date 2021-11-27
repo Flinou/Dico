@@ -21,6 +21,9 @@ public class WordDayFragment extends Fragment {
 
     ListView listView = null;
     ArrayList<String> wordOfTheDayDef = null;
+
+
+    String wordOfTheDay = null;
     public WordDayFragment() {super(R.layout.wordday_list);}
 
     public ArrayList<String> getWordOfTheDayDef() {
@@ -30,6 +33,13 @@ public class WordDayFragment extends Fragment {
     public void setWordOfTheDayDef(ArrayList<String> wordOfTheDayDef) {
         this.wordOfTheDayDef = wordOfTheDayDef;
     }
+    public String getWordOfTheDay() {
+        return wordOfTheDay;
+    }
+
+    public void setWordOfTheDay(String wordOfTheDay) {
+        this.wordOfTheDay = wordOfTheDay;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -38,16 +48,18 @@ public class WordDayFragment extends Fragment {
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
         listView = view.findViewById(R.id.wordday_list);
+        String wordOfTheDay = retrieveCurrentWordOfTheDay();
+        setWordOfTheDay(wordOfTheDay);
+        displayWordDefinition(wordOfTheDay);
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.displayAddMenu(getActivity());
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
         return view;
     }
 
     @Override
     public void onResume() {
-        String wordOfTheDay = retrieveCurrentWordOfTheDay();
-        displayWordDefinition(wordOfTheDay);
-        DisplayUtils.hideHelpMenu(getActivity());
-        DisplayUtils.displayAddMenu(getActivity());
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
+        DisplayUtils.changeFragmentTitle(getActivity(), getWordOfTheDay(), getContext().getResources());
         super.onResume();
     }
 

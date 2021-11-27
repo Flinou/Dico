@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
         viewPager.setAdapter(tabAdapter);
         Globals.gameWordsSelection = FileUtils.generateGameWords(getResources().openRawResource(R.raw.dico));
-        List<String> tabTitles = Arrays.asList("Votre liste", "Jeu du Dico", "Mot du jour");
+        List<String> tabTitles = Arrays.asList(Globals.saved_words_fragment, Globals.game_words, Globals.wordOfTheDayTitle_fragment);
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles.get(position))
         ).attach();

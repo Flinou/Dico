@@ -36,15 +36,7 @@ public class WordsSavedFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
-
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    public void onResume() {
-        listView = getActivity().findViewById(R.id.savedWords_list);
+        listView = view.findViewById(R.id.savedWords_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object obj = listView.getItemAtPosition(position);
@@ -67,6 +59,12 @@ public class WordsSavedFragment extends Fragment {
         }
         DisplayUtils.hideHelpMenu(getActivity());
         DisplayUtils.hideAddMenu(getActivity());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onResume() {
+        DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getContext().getResources());
         super.onResume();
     }
 
