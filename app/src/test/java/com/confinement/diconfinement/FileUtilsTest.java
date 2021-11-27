@@ -4,15 +4,25 @@ import android.content.Context;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
-import static org.junit.Assert.assertTrue;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import androidx.test.core.app.ApplicationProvider;
+
+@RunWith(RobolectricTestRunner.class)
 public class FileUtilsTest {
 
     private static String eclairAccentTest = "éclair";
@@ -43,6 +53,27 @@ public class FileUtilsTest {
 
     @Test
     public void needsSave() {
+    }
+
+
+    @Test
+    public void retrieveDefinitionTest() throws IOException {
+        Context appContext = ApplicationProvider.getApplicationContext();
+        FileUtils.initFirstWordDicoHashMap(appContext);
+        int dictionaryId = appContext.getResources().getIdentifier("dico","raw", "com.confinement.diconfinement");
+        InputStream is = appContext.getResources().openRawResource(dictionaryId);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String missingWords = "";
+        while(reader.ready()) {
+            String dicoWord = reader.readLine();
+            try {
+                assertNotNull(DefinitionsFinder.getDefinitions(appContext.getResources(), dicoWord));
+            } catch (AssertionError err) {
+                fail("Word : " + dicoWord + "not found.");
+            } catch (Exception e) {
+                fail("Word : " + dicoWord + "not found. Exception caught");
+            }
+        }
     }
 
     @Test
@@ -85,7 +116,6 @@ public class FileUtilsTest {
         assertTrue(accentedWritingsList.equals(expectedResult));
 
     }
-
     @Test
     public void removeFromFileTest() {
     }
