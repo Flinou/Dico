@@ -69,7 +69,12 @@ public class GameWordsFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onResume() {
-
+        listView = getActivity().findViewById(R.id.gamewords_list);
+        if (Globals.gameWordsSelection == null) {
+            listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
+        } else {
+            listView.setAdapter(new GameWordsAdapter(getActivity(), Globals.gameWordsSelection));
+        }
         DisplayUtils.changeFragmentTitle(getActivity(), Globals.selection, getContext().getResources());
         super.onResume();
     }
