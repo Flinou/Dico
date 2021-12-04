@@ -32,18 +32,6 @@ public class SharedPrefUtils {
         editor.commit();
     }
 
-    //Method to clear and put in sharedPref word saved by user before version 3.0
-    static void resetSharedPref(Resources resources, Context applicationContext, ArrayList<String> wordsList, SharedPreferences sharedPreferences) {
-        sharedPreferences.edit().clear().apply();
-        sharedPreferences.edit().putInt(Globals.needsClear, 1).commit();
-        for (String savedWrd : wordsList) {
-            if ( sharedPreferences.getString(FileUtils.normalizeString(savedWrd), null) == null ) {
-                ArrayList<String> definitions = (ArrayList<String>) DefinitionsFinder.getDefinitions(resources, savedWrd);
-                addWordToSharedPref(savedWrd, applicationContext, definitions);
-            }
-        }
-    }
-
 
     static ArrayList<String> getSharedPrefDefinition(Context context, String searchedWord) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
@@ -58,7 +46,7 @@ public class SharedPrefUtils {
         return definition;
     }
 
-    static void addWordOfTheDayToSharedPref(Context context, List<String> definitions) {
+    static void putWordOfTheDayDefinition(Context context, List<String> definitions) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -67,6 +55,12 @@ public class SharedPrefUtils {
         editor.commit();
     }
 
+    static void putWordOfTheDay(Context context, String wordOfTheDay) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Globals.wordOfTheDay, wordOfTheDay);
+        editor.commit();
+    }
     static String updateWordOfTheDayInSharedPref(int index, Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -125,6 +119,14 @@ public class SharedPrefUtils {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
         return sharedPreferences.getString(Globals.lastNotificationDate, "");
     }
+
+    public static void putNewVersionCode(Context context, int versionCode) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(Globals.appVersion, versionCode);
+        editor.commit();
+    }
+
 }
 
 

@@ -48,7 +48,7 @@ public class WordDayFragment extends Fragment {
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
         listView = view.findViewById(R.id.wordday_list);
-        String wordOfTheDay = retrieveCurrentWordOfTheDay();
+        String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
         setWordOfTheDay(wordOfTheDay);
         displayWordDefinition(wordOfTheDay);
         DisplayUtils.hideHelpMenu(getActivity());
@@ -60,22 +60,10 @@ public class WordDayFragment extends Fragment {
     @Override
     public void onResume() {
         DisplayUtils.changeFragmentTitle(getActivity(), getWordOfTheDay(), getContext().getResources());
+        String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
+        displayWordDefinition(wordOfTheDay);
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
         super.onResume();
-    }
-
-    private String retrieveCurrentWordOfTheDay() {
-        String newDate = FileUtils.updateWordOfTheDayDate(getContext());
-        if (newDate != null) {
-            return newWordOfTheDay(newDate);
-        }
-        return getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
-    }
-
-    private String newWordOfTheDay(String date) {
-        SharedPrefUtils.updateWordOfTheDayDateInSharedPref(date, getContext());
-        int newWordDayIndex = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getInt(Globals.wordOfTheDayIndex, -1) + 1;
-        SharedPrefUtils.updateWordOfTheDayIndexInSharedPref(newWordDayIndex, getContext());
-        return SharedPrefUtils.updateWordOfTheDayInSharedPref(newWordDayIndex, getContext());
     }
 
     private void displayWordDefinition(String wordOfTheDay) {
@@ -85,15 +73,10 @@ public class WordDayFragment extends Fragment {
     }
 
     private List<SpannableString> retrieveWordOfTheDayDefinition(String wordOfTheDay) {
-        if (getWordOfTheDayDef() == null) {
-            ArrayList<String> definition = (ArrayList<String>) DefinitionsFinder.getDefinitions(getResources(), wordOfTheDay);
-            setWordOfTheDayDef(definition);
-        }
-        SharedPrefUtils.addWordOfTheDayToSharedPref(getContext(), getWordOfTheDayDef());
         SpannableString dayWordSpan = new SpannableString(wordOfTheDay);
         dayWordSpan.setSpan(new RelativeSizeSpan(1f), 0,dayWordSpan.length(), 0);
         SpannableString defSpan = new SpannableString("");
-        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(getWordOfTheDayDef());
+        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(SharedPrefUtils.getSharedPrefDefinition(getContext(), Globals.wordOfTheDayDefinition));
         for (SpannableString definitionPart : definitionSpan) {
             defSpan = new SpannableString(TextUtils.concat(defSpan, definitionPart));
         }
