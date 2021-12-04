@@ -132,7 +132,7 @@ class FileUtils {
                 for (String suggestion : dictioSet.subSet(accentedQuery, accentedQuery + Character.MAX_VALUE)) {
                     suggestions.add(suggestion);
                     size++;
-                    if (size == MainActivity.suggestionNumbers) {
+                    if (size == Globals.suggestionNumbers) {
                         return suggestions;
                     }
                 }

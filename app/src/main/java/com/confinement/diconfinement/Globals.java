@@ -26,6 +26,7 @@ public class Globals extends AppCompatActivity {
     public static String game_words = "Jeu du dico";
     public static String appVersion = "appVersion";
     public static String notification = "notif";
+    public static int suggestionNumbers = 3;
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";

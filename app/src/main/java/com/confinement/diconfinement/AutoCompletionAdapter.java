@@ -26,7 +26,7 @@ public class AutoCompletionAdapter extends CursorAdapter {
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             if (cursor != null) {
-                text.setText(cursor.getString(cursor.getColumnIndex(MainActivity.columnSuggestion)));
+                text.setText(cursor.getString(cursor.getColumnIndex(Globals.columnSuggestion)));
             }
         }
 

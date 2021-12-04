@@ -29,9 +29,6 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
-
-    protected static final String columnSuggestion = "wordSuggestion";
-    protected static final Integer suggestionNumbers = 3;
     private Menu menu;
 
     public Menu getMenu() {
