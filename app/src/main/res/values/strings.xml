@@ -2,7 +2,6 @@
     <string name="app_name">Diconfinement</string>
     <string name="action_save">Save</string>
     <string name="vos_mots"><h3><i><b>Vos mots enregistrés</b></i></h3></string>
-    <string name="loading"><h3><i><b>Chargement du dictionnaire... Veuillez patienter</b></i></h3></string>
 
     <string name="main_act_label" >Diconfinement</string>
     <string name="def_act_label" >Définition</string>
@@ -14,4 +13,5 @@
     <string name="wordday">Mot du jour</string>
     <string name="selection"><h3><i><b>La sélection</b></i></h3></string>
     <string name="tirage">Nouveau tirage</string>
+    <string name="wordOfTheDay_notif">Que signifie donc %1$s ?</string>
 </resources>
