@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             Context context1 = getApplicationContext();
             FileUtils.initFirstWordDicoHashMap(context1);
             loadWordDayDefinition(context1);
-            //populate dicoWords for suggestions and game
+            //Retrieve dicoWords for suggestions and game
             Globals.getDicoWords(context1.getResources().openRawResource(R.raw.dico));
             try {
                 Thread.sleep(1000);

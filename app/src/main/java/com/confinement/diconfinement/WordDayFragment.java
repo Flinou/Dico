@@ -3,6 +3,7 @@ package com.confinement.diconfinement;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
@@ -17,25 +18,10 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WordDayFragment extends Fragment {
-
+public class WordDayFragment extends Fragment {q
     ListView listView = null;
-    ArrayList<String> wordOfTheDayDef = null;
-
-
     String wordOfTheDay = null;
     public WordDayFragment() {super(R.layout.wordday_list);}
-
-    public ArrayList<String> getWordOfTheDayDef() {
-        return wordOfTheDayDef;
-    }
-
-    public void setWordOfTheDayDef(ArrayList<String> wordOfTheDayDef) {
-        this.wordOfTheDayDef = wordOfTheDayDef;
-    }
-    public String getWordOfTheDay() {
-        return wordOfTheDay;
-    }
 
     public void setWordOfTheDay(String wordOfTheDay) {
         this.wordOfTheDay = wordOfTheDay;
@@ -66,8 +52,13 @@ public class WordDayFragment extends Fragment {
     }
 
     private void displayWordDefinition(String wordOfTheDay) {
-        List<SpannableString> definitionSpan = retrieveWordOfTheDayDefinition(wordOfTheDay);
-        listView.setAdapter(new WordDayAdapter(getContext(), definitionSpan));
+        List<SpannableString> definition = retrieveWordOfTheDayDefinition(wordOfTheDay);
+        addWordToList(wordOfTheDay, definition);
+        listView.setAdapter(new WordDayAdapter(getContext(), definition));
+    }
+
+    private void addWordToList(String wordOfTheDay, List<SpannableString> definition) {
+        definition.add(0, new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml("<h1><center>" + wordOfTheDay + "</center></h1>"))));
     }
 
     private List<SpannableString> retrieveWordOfTheDayDefinition(String wordOfTheDay) {
