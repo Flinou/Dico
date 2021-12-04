@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPager2 viewPager = findViewById(R.id.pager);
         TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
         viewPager.setAdapter(tabAdapter);
-        //Check if Application has been launeched from word of the day notification or normally clicking the app icon
+        //Check if Application has been launched from word of the day notification or normally clicking the app icon
         Boolean fromNotif = getIntent().getBooleanExtra(Globals.notification, false);
         //Display word of the day Tab if launched from notif, lands to saved words tab otherwise
         if (fromNotif) {
