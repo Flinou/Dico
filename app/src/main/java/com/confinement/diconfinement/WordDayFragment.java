@@ -1,6 +1,7 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,15 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class WordDayFragment extends Fragment {q
+public class WordDayFragment extends Fragment {
     ListView listView = null;
+    TextView titleView = null;
     String wordOfTheDay = null;
     public WordDayFragment() {super(R.layout.wordday_list);}
 
@@ -34,6 +36,7 @@ public class WordDayFragment extends Fragment {q
         View view = inflater.inflate(R.layout.wordday_list,
                 container, false);
         listView = view.findViewById(R.id.wordday_list);
+        titleView = view.findViewById(R.id.textview_wordday);
         String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
         setWordOfTheDay(wordOfTheDay);
         displayWordDefinition(wordOfTheDay);
@@ -53,12 +56,8 @@ public class WordDayFragment extends Fragment {q
 
     private void displayWordDefinition(String wordOfTheDay) {
         List<SpannableString> definition = retrieveWordOfTheDayDefinition(wordOfTheDay);
-        addWordToList(wordOfTheDay, definition);
+        titleView.setText(wordOfTheDay);
         listView.setAdapter(new WordDayAdapter(getContext(), definition));
-    }
-
-    private void addWordToList(String wordOfTheDay, List<SpannableString> definition) {
-        definition.add(0, new SpannableString(DisplayUtils.trimTrailingWhitespace(Html.fromHtml("<h1><center>" + wordOfTheDay + "</center></h1>"))));
     }
 
     private List<SpannableString> retrieveWordOfTheDayDefinition(String wordOfTheDay) {

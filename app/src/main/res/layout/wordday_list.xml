@@ -4,7 +4,29 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/textview_wordday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorDarkWhite"
+            android:padding="10dip"
+            android:gravity="center"
+            android:textStyle="bold|italic"
+            android:textSize="20dip" >
+        </TextView>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:id="@+id/separator"
+            android:visibility="visible"
+            android:background="#c7c7c7"/>
+    </LinearLayout>
     <include
         layout="@layout/listview"
         android:id="@+id/wordday_list"/>
