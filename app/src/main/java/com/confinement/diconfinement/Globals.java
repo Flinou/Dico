@@ -11,7 +11,7 @@ import java.util.TreeSet;
 public class Globals extends AppCompatActivity {
     static final int gameWordsNumber = 5;
     static final int gameWordsMinSize = 4;
-    public static String needsClear = "needsClear";
+    public static String wordOfTheDay = "wordOfTheDay";
     public static String wordOfTheDayDefault = "Janotisme";
     public static String wordOfTheDayDate = "wordDaydate";
     public static String wordOfTheDayIndex = "wordDayIndex";
@@ -19,11 +19,13 @@ public class Globals extends AppCompatActivity {
     public static String alarm = "alarm";
     public static String lastNotificationDate = "lastNotificationDate";
     public static String channel_id = "channel_id";
-    public static String channel_description = "Channel for new word of the dat notification";
-    public static CharSequence notification_content = "Il y a un nouveau mot du jour !";
-    public static CharSequence notification_title = "Scientia potentia est";
+    public static String channel_description = "Channel for new word of the day notification";
+    public static CharSequence notification_content = "Que signifie donc ";
+    public static CharSequence notification_title = "Allez viens, on est bien !";
     public static CharSequence channel_name = "Notif channel";
     public static String game_words = "Jeu du dico";
+    public static String appVersion = "appVersion";
+    public static String notification = "notif";
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
     static final String wordSaved = "Mot sauvegardé dans votre liste";
@@ -36,7 +38,7 @@ public class Globals extends AppCompatActivity {
     static final String natureXml = "nature";
     static final String columnSuggestion = "wordSuggestion";
     static final String selection = "La sélection";
-    static final String wordOfTheDayTitle = "Le mot du jour";
+    static final String wordOfTheDayTitle = "MDJ";
     static final String wordOfTheDayTitle_fragment = "Mot du jour";
     static final String saved_words = "Mots enregistrés";
     static final String saved_words_fragment = "Votre liste";
