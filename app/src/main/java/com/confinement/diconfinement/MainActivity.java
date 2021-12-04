@@ -192,36 +192,28 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
-
         DisplayUtils.hideHelpMenu(this);
         DisplayUtils.hideAddMenu(this);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.help_game: {
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle(Globals.gameName)
-                                .setMessage(Globals.gameExplanations)
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                    }
-                                })
-                                .setIcon(android.R.drawable.ic_menu_help)
-                                .show();
-                        return true;
-                    }
-                    case R.id.add_word: {
-                        String wordToSave = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
-                        List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.wordOfTheDayDefinition);
-                        FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
-                    }
-                    default:
-                        return false;
+        toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.help_game: {
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle(Globals.gameName)
+                            .setMessage(Globals.gameExplanations)
+                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            })
+                            .setIcon(android.R.drawable.ic_menu_help)
+                            .show();
+                    return true;
                 }
+                case R.id.add_word: {
+                    String wordToSave = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
+                    List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.wordOfTheDayDefinition);
+                    FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
+                }
+                default:
+                    return false;
             }
-
         });
         return true;
     }
