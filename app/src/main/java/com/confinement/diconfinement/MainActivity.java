@@ -4,7 +4,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,18 +20,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,19 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final View loadingLayout = findViewById(R.id.loadingLayout);
         final TextView fragmentTitle = findViewById(R.id.fragment_title);
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-
-
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        ViewPager2 viewPager = findViewById(R.id.pager);
-        TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
-        viewPager.setAdapter(tabAdapter);
-        Globals.gameWordsSelection = FileUtils.generateGameWords(getResources().openRawResource(R.raw.dico));
-        List<String> tabTitles = Arrays.asList(Globals.saved_words_fragment, Globals.game_words, Globals.wordOfTheDayTitle_fragment);
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(tabTitles.get(position))
-        ).attach();
-
+        TabLayout tabLayout = setUpTabLayout();
         new Thread(new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {
@@ -82,11 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 Context context = getApplicationContext();
                 FileUtils.initFirstWordDicoHashMap(context);
-                //Necessary because of changes in sharedPreferences structure
-                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE);
-                if (sharedPreferences.getInt(Globals.needsClear, 0) == 0) {
-                    SharedPrefUtils.resetSharedPref(getResources(), context, FileUtils.retrieveSavedWords(context), sharedPreferences);
-                }
+                loadWordDayDefinition(context);
                 //populate dicoWords for suggestions and game
                 Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
                 try {
@@ -104,12 +82,82 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    @NonNull
+    private TabLayout setUpTabLayout() {
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        ViewPager2 viewPager = findViewById(R.id.pager);
+        TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
+        viewPager.setAdapter(tabAdapter);
+        //Check if Application has been launeched from word of the day notification or normally clicking the app icon
+        Boolean fromNotif = getIntent().getBooleanExtra(Globals.notification, false);
+        //Display word of the day Tab if launched from notif, lands to saved words tab otherwise
+        if (fromNotif) {
+            viewPager.setCurrentItem(2);
+        } else {
+            viewPager.setCurrentItem(0);
+        }
+        Globals.gameWordsSelection = FileUtils.generateGameWords(getResources().openRawResource(R.raw.dico));
+        List<String> tabTitles = Arrays.asList(Globals.saved_words_fragment, Globals.game_words, Globals.wordOfTheDayTitle_fragment);
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(tabTitles.get(position))
+        ).attach();
+        return tabLayout;
+    }
+
+    /**
+     * Retrieve and store in sharedPref current word of the day and definition for performances purposes
+     * @param appContext
+     */
+    private void loadWordDayDefinition(Context appContext) {
+        String oldWordOfTheDay = appContext.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, "");
+        String wordOfTheDay = WordOfTheDayUtils.retrieveCurrentWordOfTheDay(appContext);
+        if (!wordOfTheDay.equalsIgnoreCase(oldWordOfTheDay)) {
+            SharedPrefUtils.putWordOfTheDay(appContext, wordOfTheDay);
+            SharedPrefUtils.putWordOfTheDayDefinition(appContext, DefinitionsFinder.getDefinitions(getResources(), wordOfTheDay));
+        }
+    }
+
+    /**
+     * Set or reset alarm (for notification purpose) every time the application is upgraded or installed
+     * @param context
+     */
     private void setAlarmIfNeeded(Context context) {
-        if (!SharedPrefUtils.isAlarmSet(context)) {
+        if (isAlarmNeeded(context)) {
             AlarmService amService = new AlarmService(context);
             amService.startAlarm();
             SharedPrefUtils.setAlarmSharedPref(context);
         }
+    }
+
+    /**
+     * Check if alarm (for notification purpose) is needed. Depends on the value of the version code.
+     * @param context
+     * @return true if alarm needs to be set
+     */
+    private boolean isAlarmNeeded(Context context) {
+        int versionCode = getCurrentVersionCode();
+        int oldVersionCode = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getInt(Globals.appVersion, 0);
+        if (oldVersionCode == 0 || versionCode > oldVersionCode) {
+            SharedPrefUtils.putNewVersionCode(context, versionCode);
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * @return current version code base on manifest file
+     */
+    private int getCurrentVersionCode() {
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = this.getPackageManager()
+                    .getPackageInfo(this.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return packageInfo.versionCode;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
