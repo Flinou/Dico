@@ -65,6 +65,7 @@ public class WordsSavedFragment extends Fragment {
     @Override
     public void onResume() {
         DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getContext().getResources());
+        displaySavedWords(listView);
         super.onResume();
     }
 
