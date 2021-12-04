@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -69,13 +70,15 @@ public class GameWordsFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onResume() {
-        listView = getActivity().findViewById(R.id.gamewords_list);
+        FragmentActivity activity = getActivity();
+        listView = activity.findViewById(R.id.gamewords_list);
         if (Globals.gameWordsSelection == null) {
-            listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
+            listView.setAdapter(new GameWordsAdapter(activity, FileUtils.generateGameWords(activity.getResources().openRawResource(R.raw.dico))));
         } else {
-            listView.setAdapter(new GameWordsAdapter(getActivity(), Globals.gameWordsSelection));
+            listView.setAdapter(new GameWordsAdapter(activity, Globals.gameWordsSelection));
         }
-        DisplayUtils.changeFragmentTitle(getActivity(), Globals.selection, getContext().getResources());
+        DisplayUtils.displayHelpMenu(activity);
+        DisplayUtils.hideAddMenu(activity);
         super.onResume();
     }
 

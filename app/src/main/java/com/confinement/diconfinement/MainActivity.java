@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -52,14 +51,13 @@ public class MainActivity extends AppCompatActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final View loadingLayout = findViewById(R.id.loadingLayout);
-        final TextView fragmentTitle = findViewById(R.id.fragment_title);
         TabLayout tabLayout = setUpTabLayout();
         new Thread(new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DisplayUtils.displaySpinner(toolbar, fragmentTitle, loadingLayout, tabLayout);
+                        DisplayUtils.displayLoadingImage(toolbar, loadingLayout, tabLayout);
                     }
                 });
                 Context context = getApplicationContext();
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DisplayUtils.hideSpinner(toolbar, fragmentTitle, loadingLayout, tabLayout);
+                        DisplayUtils.hideLoadingImage(toolbar, loadingLayout, tabLayout);
                     }
                 });
             }

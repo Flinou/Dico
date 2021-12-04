@@ -51,15 +51,14 @@ public class WordDayFragment extends Fragment {
         String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
         setWordOfTheDay(wordOfTheDay);
         displayWordDefinition(wordOfTheDay);
-        DisplayUtils.hideHelpMenu(getActivity());
-        DisplayUtils.displayAddMenu(getActivity());
         DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
         return view;
     }
 
     @Override
     public void onResume() {
-        DisplayUtils.changeFragmentTitle(getActivity(), getWordOfTheDay(), getContext().getResources());
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.displayAddMenu(getActivity());
         String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
         displayWordDefinition(wordOfTheDay);
         DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
@@ -67,7 +66,6 @@ public class WordDayFragment extends Fragment {
     }
 
     private void displayWordDefinition(String wordOfTheDay) {
-        DisplayUtils.changeFragmentTitle(getActivity(), wordOfTheDay, getContext().getResources());
         List<SpannableString> definitionSpan = retrieveWordOfTheDayDefinition(wordOfTheDay);
         listView.setAdapter(new WordDayAdapter(getContext(), definitionSpan));
     }

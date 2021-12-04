@@ -20,19 +20,5 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
-
-        <TextView
-            android:id="@+id/fragment_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="15dip"
-            android:fontFamily="sans-serif-condensed"
-            android:background="@color/colorPrimaryDark"
-            android:textSize="20dip">
-        </TextView>
     </LinearLayout>
-
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

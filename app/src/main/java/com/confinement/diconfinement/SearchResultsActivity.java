@@ -179,8 +179,6 @@ public class SearchResultsActivity extends AppCompatActivity {
         final ListView listView = findViewById(R.id.view_list);
         String searchedWord = null;
 
-        TextView wordsSavedTitle = findViewById(R.id.fragment_title);
-        wordsSavedTitle.setVisibility(View.GONE);
         setSearchedWord("");
         if (getIntent() != null){
             searchedWord = getIntent().getStringExtra(SearchManager.QUERY);

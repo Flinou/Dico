@@ -51,21 +51,19 @@ public class WordsSavedFragment extends Fragment {
                 }
             }
         });
-        DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getActivity().getResources());
         displaySavedWords(listView);
         //Set saved list position when returning to activity
         if (index != null && top != null){
             listView.setSelectionFromTop(index, top);
         }
-        DisplayUtils.hideHelpMenu(getActivity());
-        DisplayUtils.hideAddMenu(getActivity());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onResume() {
-        DisplayUtils.changeFragmentTitle(getActivity(), Globals.saved_words, getContext().getResources());
         displaySavedWords(listView);
+        DisplayUtils.hideHelpMenu(getActivity());
+        DisplayUtils.hideAddMenu(getActivity());
         super.onResume();
     }
 
