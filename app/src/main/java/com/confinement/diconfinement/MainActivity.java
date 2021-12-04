@@ -52,31 +52,19 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final View loadingLayout = findViewById(R.id.loadingLayout);
         TabLayout tabLayout = setUpTabLayout();
-        new Thread(new Runnable() {
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DisplayUtils.displayLoadingImage(toolbar, loadingLayout, tabLayout);
-                    }
-                });
-                Context context = getApplicationContext();
-                FileUtils.initFirstWordDicoHashMap(context);
-                loadWordDayDefinition(context);
-                //populate dicoWords for suggestions and game
-                Globals.getDicoWords(context.getResources().openRawResource(R.raw.dico));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DisplayUtils.hideLoadingImage(toolbar, loadingLayout, tabLayout);
-                    }
-                });
+        new Thread(() -> {
+            runOnUiThread(() -> DisplayUtils.displayLoadingImage(toolbar, loadingLayout, tabLayout));
+            Context context1 = getApplicationContext();
+            FileUtils.initFirstWordDicoHashMap(context1);
+            loadWordDayDefinition(context1);
+            //populate dicoWords for suggestions and game
+            Globals.getDicoWords(context1.getResources().openRawResource(R.raw.dico));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            runOnUiThread(() -> DisplayUtils.hideLoadingImage(toolbar, loadingLayout, tabLayout));
         }).start();
     }
 
