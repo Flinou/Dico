@@ -10,10 +10,8 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,10 +23,8 @@ import java.util.List;
 public class SearchResultsActivity extends AppCompatActivity {
 
     private String searchedWord;
-    private Menu searchResultsMenu;
     private boolean needsSave;
     private Menu menu;
-    private Integer position;
     private List<String> definitions;
 
     public List<String> getDefinitions() {
@@ -54,15 +50,6 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void setSearchedWord(String word) {
         this.searchedWord = word;
     }
-
-    private void setPosition(Integer position) {
-        this.position = position;
-    }
-
-    private Integer getPosition() {
-        return this.position;
-    }
-
     private boolean getNeedsSave() {
         return this.needsSave;
     }
@@ -124,15 +111,10 @@ public class SearchResultsActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        setSearchResultsMenu(menu);
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getApplicationContext(), getSearchedWord()), getResources().getDrawable(R.drawable.ic_addword));
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getApplicationContext(), getSearchedWord()), getResources().getDrawable(R.drawable.ic_addword, null));
         return super.onPrepareOptionsMenu(menu);
     }
 
-
-    private void setSearchResultsMenu(Menu menu) {
-        this.searchResultsMenu = menu;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -168,7 +150,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             if (definToDisplay != null) return definToDisplay;
         }
         ArrayList<String> definToDisplay = new ArrayList<>();
-        definToDisplay.add(Globals.userQueryNotInDict);
+        definToDisplay.add(Globals.USER_QUERY_NOT_IN_DICT);
         return definToDisplay;
     }
 
@@ -191,7 +173,6 @@ public class SearchResultsActivity extends AppCompatActivity {
             definition = handleIntent(getIntent());
         }
 
-        setPosition(getIntent().getIntExtra("position", 0));
         List<SpannableString> definitionsSpannable = DisplayUtils.createSpannableFromString(definition);
         setDefinitions(definition);
         listView.setAdapter(new WordDayAdapter(getApplicationContext(), definitionsSpannable));

@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.widget.SearchView;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -22,7 +21,7 @@ public class AutoCompletion {
         super();
     }
 
-    public final static AutoCompletion getInstance() {
+    public static final AutoCompletion getInstance() {
         if (AutoCompletion.instance == null) {
             synchronized(AutoCompletion.class) {
                 if (AutoCompletion.instance == null) {
@@ -36,7 +35,7 @@ public class AutoCompletion {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     void autocomplete(String query, Menu menu, ContextWrapper ctx) {
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        String[] columns = {"_id", Globals.columnSuggestion};
+        String[] columns = {"_id", Globals.COLUMN_SUGGESTION};
         MatrixCursor cursor = new MatrixCursor(columns);
         ArrayList<String> suggestions = FileUtils.retrieveSuggestions(Globals.getDicoWords(ctx.getResources().openRawResource(R.raw.dico)), query);
         if (!suggestions.isEmpty()) {
@@ -61,7 +60,7 @@ public class AutoCompletion {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra(SearchManager.QUERY,savedWord.toString());
-        intent.setComponent(new ComponentName(Globals.packageName, Globals.packageName + ".SearchResultsActivity"));
+        intent.setComponent(new ComponentName(Globals.PACKAGE_NAME, Globals.PACKAGE_NAME + ".SearchResultsActivity"));
         return intent;
     }
 

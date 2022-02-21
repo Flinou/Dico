@@ -1,7 +1,6 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
@@ -20,6 +19,10 @@ import java.util.List;
 
 public class DisplayUtils {
 
+    private DisplayUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     static void displayToast(Context context, String stringToDisplay) {
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, stringToDisplay, duration);
@@ -30,9 +33,9 @@ public class DisplayUtils {
         if(source == null)
             return "";
         int i = source.length();
-
         while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
         }
+
         return source.subSequence(0, i+1);
     }
 
@@ -58,7 +61,7 @@ public class DisplayUtils {
         search.setIconified(true);
     }
 
-    public static List<SpannableString> createSpannableFromString(ArrayList<String> definition) {
+    public static List<SpannableString> createSpannableFromString(List<String> definition) {
         List<SpannableString> spanStrings = new ArrayList<>();
         for (String defPart : definition){
             defPart = DisplayUtils.removeUnwantedCharacters(defPart);

@@ -1,59 +1,56 @@
 package com.confinement.diconfinement;
-import android.content.res.Resources;
 import android.text.SpannableString;
 
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
+
 public class Globals extends AppCompatActivity {
-    static final int gameWordsNumber = 5;
-    static final int gameWordsMinSize = 4;
-    public static String wordOfTheDay = "wordOfTheDay";
-    public static String wordOfTheDayDefault = "Janotisme";
-    public static String wordOfTheDayDate = "wordDaydate";
-    public static String wordOfTheDayIndex = "wordDayIndex";
-    public static String wordOfTheDayDefinition = "wordDayDef";
-    public static String alarm = "alarm";
-    public static String lastNotificationDate = "lastNotificationDate";
-    public static String channel_id = "channel_id";
-    public static String channel_description = "Channel for new word of the day notification";
-    public static CharSequence notification_content = "Que signifie donc ";
-    public static CharSequence notification_title = "Allez viens, on est bien !";
-    public static CharSequence channel_name = "Notif channel";
-    public static String game_words = "Jeu du dico";
-    public static String appVersion = "appVersion";
-    public static String notification = "notif";
-    public static int suggestionNumbers = 3;
+    static final int GAME_WORDS_NUMBER = 5;
+    static final int GAME_WORDS_MIN_SIZE = 4;
+    static final String WORD_OF_THE_DAY = "wordOfTheDay";
+    static final String WORD_OF_THE_DAY_DEFAULT = "Janotisme";
+    static final String WORD_DAYDATE = "wordDaydate";
+    static final String WORD_DAY_INDEX = "wordDayIndex";
+    static final String WORD_DAY_DEF = "wordDayDef";
+    static final String ALARM = "alarm";
+    static final String LAST_NOTIFICATION_DATE = "lastNotificationDate";
+    static final String CHANNEL_ID = "channel_id";
+    static final String CHANNEL_DESCRIPTION = "Channel for new word of the day notification";
+    static final CharSequence NOTIFICATION_TITLE = "Allez viens, on est bien !";
+    static final CharSequence CHANNEL_NAME = "Notif channel";
+    static final String GAME_WORDS = "Jeu du dico";
+    static final String APP_VERSION = "appVersion";
+    static final String NOTIFICATION = "notif";
+    static final int SUGGESTION_NUMBERS = 3;
     static TreeSet<String> dicoWords = null;
     static HashMap<Integer, String> gameWords = null;
-    static final String wordSaved = "Mot sauvegardé dans votre liste";
-    static final String wordUnsaved = "Mot retiré de votre liste";
-    static final String userQueryNotInDict = "Ce mot n'appartient pas au dictionnaire.";
-    static final String defXml = "def";
-    static final String definitionXml = "definition";
-    static final String typeXml = "type";
-    static final String synXml = "syn";
-    static final String natureXml = "nature";
-    static final String columnSuggestion = "wordSuggestion";
-    static final String selection = "La sélection";
-    static final String wordOfTheDayTitle = "MDJ";
-    static final String wordOfTheDayTitle_fragment = "Mot du jour";
-    static final String saved_words = "Mots enregistrés";
-    static final String saved_words_fragment = "Votre liste";
-    static final String preferenceFile = "preferenceFile";
-    static final Integer suggestionsMaxLength = 3;
-    static final String gameName = "Le jeu du Diconfinement";
-    static final String gameExplanations = "5 mots ?\nVous en choisissez un.\nVos amis doivent ensuite en deviner le sens ou en faire la définition la plus drôle possible.\nVous choisissez l'heureux vainqueur qui prendra votre rôle au tour suivant.\nEffectivement, c'est pas fou comme jeu mais on manquait de budget." ;
-    static String savedWordsFileName = "savedWords";
-    static String wordOfTheDayFileName = "dayword";
-    static String packageName = "com.confinement.diconfinement";
-    static ArrayList<SpannableString> gameWordsSelection = null;
+    static final String WORD_SAVED = "Mot sauvegardé dans votre liste";
+    static final String WORD_UNSAVED = "Mot retiré de votre liste";
+    static final String USER_QUERY_NOT_IN_DICT = "Ce mot n'appartient pas au dictionnaire.";
+    static final String DEF_XML = "def";
+    static final String DEFINITION_XML = "definition";
+    static final String TYPE_XML = "type";
+    static final String SYN_XML = "syn";
+    static final String NATURE_XML = "nature";
+    static final String COLUMN_SUGGESTION = "wordSuggestion";
+    static final String WORD_OF_THE_DAY_TITLE = "MDJ";
+    static final String WORD_OF_THE_DAY_TITLE_FRAGMENT = "Mot du jour";
+    static final String SAVED_WORDS_FRAGMENT = "Votre liste";
+    static final String PREFERENCE_FILE = "preferenceFile";
+    static final Integer SUGGESTIONS_MAX_LENGTH = 3;
+    static final String GAME_NAME = "Le jeu du Diconfinement";
+    static final String GAME_EXPLANATIONS = "5 mots ?\nVous en choisissez un.\nVos amis doivent ensuite en deviner le sens ou en faire la définition la plus drôle possible.\nVous choisissez l'heureux vainqueur qui prendra votre rôle au tour suivant.\nEffectivement, c'est pas fou comme jeu mais on manquait de budget." ;
+    static final String SAVED_WORDS_FILE_NAME = "savedWords";
+    static final String WORD_OF_THE_DAY_FILE_NAME = "dayword";
+    static final String PACKAGE_NAME = "com.confinement.diconfinement";
+    static List<SpannableString> gameWordsSelection = null;
     static TreeSet<String> getDicoWords(InputStream is) {
         if (dicoWords == null) {
-            FileUtils.populateDicoWords(is);
+            FileUtils.populateDicoAndGameWords(is);
         }
         return Globals.dicoWords;
     }
@@ -64,7 +61,7 @@ public class Globals extends AppCompatActivity {
     //Game words are words from dico whose size is > 4
     static HashMap<Integer, String> getGameWords(InputStream is) {
         if (gameWords == null) {
-            FileUtils.populateDicoWords(is);
+            FileUtils.populateDicoAndGameWords(is);
         }
         return Globals.gameWords;
     }
@@ -72,7 +69,7 @@ public class Globals extends AppCompatActivity {
         Globals.dicoWords = wordsListSet;
     }
 
-    public static void setGameWordsSelection(ArrayList<SpannableString> gameWordsSelection) {
+    public static void setGameWordsSelection(List<SpannableString> gameWordsSelection) {
         Globals.gameWordsSelection = gameWordsSelection;
     }
 }

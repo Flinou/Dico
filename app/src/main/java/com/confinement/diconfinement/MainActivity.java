@@ -3,13 +3,12 @@ package com.confinement.diconfinement;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 
@@ -26,10 +25,13 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class MainActivity extends AppCompatActivity {
     private Menu menu;
+    static Logger logger = Logger.getLogger(MainActivity.class.getName());
 
     public Menu getMenu() {
         return menu;
@@ -59,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "Unable to pause thread");
+                Thread.currentThread().interrupt();
             }
             runOnUiThread(() -> DisplayUtils.hideLoadingImage(toolbar, loadingLayout, tabLayout));
         }).start();
@@ -73,15 +76,15 @@ public class MainActivity extends AppCompatActivity {
         TabCollectionAdapter tabAdapter = new TabCollectionAdapter(supportFragmentManager, getLifecycle());
         viewPager.setAdapter(tabAdapter);
         //Check if Application has been launched from word of the day notification or normally clicking the app icon
-        Boolean fromNotif = getIntent().getBooleanExtra(Globals.notification, false);
+        Boolean fromNotif = getIntent().getBooleanExtra(Globals.NOTIFICATION, false);
         //Display word of the day Tab if launched from notif, lands to saved words tab otherwise
-        if (fromNotif) {
+        if (Boolean.TRUE.equals(fromNotif)) {
             viewPager.setCurrentItem(2);
         } else {
             viewPager.setCurrentItem(0);
         }
         Globals.gameWordsSelection = FileUtils.generateGameWords(getResources().openRawResource(R.raw.dico));
-        List<String> tabTitles = Arrays.asList(Globals.saved_words_fragment, Globals.game_words, Globals.wordOfTheDayTitle_fragment);
+        List<String> tabTitles = Arrays.asList(Globals.SAVED_WORDS_FRAGMENT, Globals.GAME_WORDS, Globals.WORD_OF_THE_DAY_TITLE_FRAGMENT);
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles.get(position))
         ).attach();
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
      * @param appContext
      */
     private void loadWordDayDefinition(Context appContext) {
-        String oldWordOfTheDay = appContext.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, "");
+        String oldWordOfTheDay = appContext.getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, "");
         String wordOfTheDay = WordOfTheDayUtils.retrieveCurrentWordOfTheDay(appContext);
         if (!wordOfTheDay.equalsIgnoreCase(oldWordOfTheDay)) {
             SharedPrefUtils.putWordOfTheDay(appContext, wordOfTheDay);
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean isAlarmNeeded(Context context) {
         int versionCode = getCurrentVersionCode();
-        int oldVersionCode = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getInt(Globals.appVersion, 0);
+        int oldVersionCode = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getInt(Globals.APP_VERSION, 0);
         if (oldVersionCode == 0 || versionCode > oldVersionCode) {
             SharedPrefUtils.putNewVersionCode(context, versionCode);
             return true;
@@ -138,9 +141,13 @@ public class MainActivity extends AppCompatActivity {
             packageInfo = this.getPackageManager()
                     .getPackageInfo(this.getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Unable to get packageInfo version");
         }
-        return packageInfo.versionCode;
+        if (packageInfo != null) {
+            return packageInfo.versionCode;
+        } else {
+            return 0;
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -198,23 +205,22 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.help_game: {
                     new AlertDialog.Builder(MainActivity.this)
-                            .setTitle(Globals.gameName)
-                            .setMessage(Globals.gameExplanations)
+                            .setTitle(Globals.GAME_NAME)
+                            .setMessage(Globals.GAME_EXPLANATIONS)
                             .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                             })
                             .setIcon(android.R.drawable.ic_menu_help)
                             .show();
                     return true;
-                }
-                case R.id.add_word: {
-                    String wordToSave = getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayTitle, Globals.wordOfTheDayDefault);
-                    List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.wordOfTheDayDefinition);
-                    FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
-                }
-                default:
+                } case R.id.add_word: {
+                    String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY_TITLE, Globals.WORD_OF_THE_DAY_DEFAULT);
+                    List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.WORD_DAY_DEF);
+                    FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword, null));
+                    return true;
+                } default: {
                     return false;
             }
-        });
+        }});
         return true;
     }
 }

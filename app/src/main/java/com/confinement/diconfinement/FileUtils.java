@@ -1,6 +1,7 @@
 package com.confinement.diconfinement;
 
 import android.app.SearchManager;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -32,8 +35,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import android.icu.text.Collator;
@@ -41,16 +45,21 @@ import org.apache.commons.lang3.StringUtils;
 
 class FileUtils {
 
+    private FileUtils() {
+        throw new IllegalStateException("Utility class");
+    }
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
-    static final String wordAttribute = "val";
-    private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<String, Integer>();
+    static Logger logger = Logger.getLogger(FileUtils.class.getName());
+    static final String WORDATTRIBUTE = "val";
+    private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<>();
+    private static SecureRandom rand = new SecureRandom();
 
 
     static Integer filetoSearch(String query) {
         final Collator instance = Collator.getInstance(Locale.FRENCH);
         instance.setStrength(Collator.SECONDARY);
         instance.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-        List<String> wordDicoKeys = new ArrayList<String>(wordDicoHashMap.keySet());
+        List<String> wordDicoKeys = new ArrayList<>(wordDicoHashMap.keySet());
         //Reverse wordDicoKeys because it's simpler to compare user query browsing dictionary from the end to the beginning
         Collections.reverse(wordDicoKeys);
         if (query != null) {
@@ -64,14 +73,11 @@ class FileUtils {
     }
 
     static void writeToFile(File filePath, String wordToAdd) {
-        File file = new File(filePath, Globals.savedWordsFileName);
-        try {
-            FileWriter writer = new FileWriter(file, true);
+        File file = new File(filePath, Globals.SAVED_WORDS_FILE_NAME);
+        try (FileWriter writer = new FileWriter(file, true)) {
             writer.append(wordToAdd).append('\n');
-            writer.close();
         } catch (IOException e) {
-            System.out.println("writeToFile : An error occurred adding word to dictionnary file.");
-            e.printStackTrace();
+            logger.log(Level.WARNING,"writeToFile : An error occurred adding word to dictionnary file.");
         }
 
     }
@@ -80,9 +86,9 @@ class FileUtils {
     static boolean needsSave(Context context, String wordToAdd) {
         FileInputStream fis;
         try {
-            fis = context.openFileInput(Globals.savedWordsFileName);
+            fis = context.openFileInput(Globals.SAVED_WORDS_FILE_NAME);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "needsSave : Unable to find saved words file");
             return true;
         }
         InputStreamReader inputStreamReader =
@@ -96,12 +102,12 @@ class FileUtils {
                 line = reader.readLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "needsSave : Unable to open saved words file");
         }
         return true;
     }
 
-    static void populateDicoWords(InputStream is) {
+    static void populateDicoAndGameWords(InputStream is) {
         TreeSet<String> wordsListSet = new TreeSet<>();
         HashMap<Integer, String> gameWords = new HashMap<>();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -110,13 +116,13 @@ class FileUtils {
             while (reader.ready()) {
                 String currentLine = reader.readLine();
                 wordsListSet.add(currentLine);
-                if (currentLine.length() > Globals.gameWordsMinSize) {
+                if (currentLine.length() > Globals.GAME_WORDS_MIN_SIZE) {
                     gameWords.put(index, currentLine);
                     index++;
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "populateDicoAndGameWords : Unable create game words or dictionary TreeSet");
         }
         Globals.setGameWords(gameWords);
         Globals.setDicoWords(wordsListSet);
@@ -125,14 +131,14 @@ class FileUtils {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<String> retrieveSuggestions(TreeSet<String> dictioSet, String wordToComplete) {
         ArrayList<String> suggestions = new ArrayList<>();
-        if (wordToComplete != null && wordToComplete.length() >= Globals.suggestionsMaxLength) {
+        if (wordToComplete != null && wordToComplete.length() >= Globals.SUGGESTIONS_MAX_LENGTH) {
             int size = 0;
             ArrayList<String> accentedQueryList = createAccentedWritings(wordToComplete);
             for (String accentedQuery : accentedQueryList) {
                 for (String suggestion : dictioSet.subSet(accentedQuery, accentedQuery + Character.MAX_VALUE)) {
                     suggestions.add(suggestion);
                     size++;
-                    if (size == Globals.suggestionNumbers) {
+                    if (size == Globals.SUGGESTION_NUMBERS) {
                         return suggestions;
                     }
                 }
@@ -192,7 +198,7 @@ class FileUtils {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeFromFile(File filePath, String wordToRemove) {
 
-        File savedWordsFile = new File(filePath, Globals.savedWordsFileName);
+        File savedWordsFile = new File(filePath, Globals.SAVED_WORDS_FILE_NAME);
         String tempFileName = "tempfile";
         File tempFile = new File(filePath, tempFileName);
 
@@ -205,18 +211,16 @@ class FileUtils {
                     writer.newLine();
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Unable to remove word :" + wordToRemove + " from saved words file");
         }
 
         if (!savedWordsFile.delete()) {
-            System.out.println("Unable to delete file");
+            logger.log(Level.WARNING, "removeFromFile - Unable to delete saved words file");
         }
 
         if (!tempFile.renameTo(savedWordsFile)){
-            System.out.println("Unable to rename file");
+            logger.log(Level.WARNING, "removeFromFile - Unable to rename saved words file");
         }
     }
 
@@ -226,12 +230,9 @@ class FileUtils {
 
         FileInputStream savedWordsInptStrm;
         try {
-            savedWordsInptStrm = context.openFileInput(Globals.savedWordsFileName);
+            savedWordsInptStrm = context.openFileInput(Globals.SAVED_WORDS_FILE_NAME);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return savedWordsString;
-        }
-        if (savedWordsInptStrm == null) {
+            logger.log(Level.WARNING, "needsSave : Unable to find saved words file");
             return savedWordsString;
         }
 
@@ -240,7 +241,7 @@ class FileUtils {
         try (BufferedReader savedWordsReader = new BufferedReader(savedWrdsInptStrmRdr)) {
             readSavedWordsList(savedWordsString, savedWordsReader);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "needsSave : Unable to read saved words file");
         }
 
         return savedWordsString;
@@ -257,14 +258,11 @@ class FileUtils {
 
     static ArrayList<SpannableString> sortAndConvertToSpannableList(ArrayList<String> savedWordsString) {
         ArrayList<SpannableString> savedWordsList = new ArrayList<>();
-        if (savedWordsString.size() != 0) {
-            Collections.sort(savedWordsString, new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    o1 = Normalizer.normalize(o1, Normalizer.Form.NFD);
-                    o2 = Normalizer.normalize(o2, Normalizer.Form.NFD);
-                    return o1.compareTo(o2);
-                }
+        if (!savedWordsString.isEmpty()) {
+            Collections.sort(savedWordsString, (o1, o2) -> {
+                o1 = Normalizer.normalize(o1, Normalizer.Form.NFD);
+                o2 = Normalizer.normalize(o2, Normalizer.Form.NFD);
+                return o1.compareTo(o2);
             });
             for (String word : savedWordsString) {
                 savedWordsList.add(new SpannableString(word));
@@ -282,10 +280,9 @@ class FileUtils {
         for (int i=1; i<=dictionNumbers - 2; i++){
             String dicoIdentifierString = dicoIdentifierPattern + i;
 
-            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", Globals.packageName);
+            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", Globals.PACKAGE_NAME);
             InputStream is = applicationContext.getResources().openRawResource(dictionaryId);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 String line = reader.readLine();
                 //We stop browsing dico at the first definition
                 while(!line.contains("definition")){
@@ -300,7 +297,7 @@ class FileUtils {
                     wordDicoHashMap.put(fileFirstWord, dictionaryId);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, "needsSave : Unable to open dictionary words file");
             }
 
         }
@@ -310,7 +307,7 @@ class FileUtils {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra(SearchManager.QUERY,savedWord.toString());
-        intent.setComponent(new ComponentName(Globals.packageName, Globals.packageName + ".SearchResultsActivity"));
+        intent.setComponent(new ComponentName(Globals.PACKAGE_NAME, Globals.PACKAGE_NAME + ".SearchResultsActivity"));
         intent.putExtra("position", position);
         return intent;
     }
@@ -323,7 +320,7 @@ class FileUtils {
     }
 
     static BufferedReader openRawFile(String dayWordFileName, Context context) {
-        int dayWordId = context.getResources().getIdentifier(dayWordFileName,"raw", Globals.packageName);
+        int dayWordId = context.getResources().getIdentifier(dayWordFileName,"raw", Globals.PACKAGE_NAME);
         InputStream is = context.getResources().openRawResource(dayWordId);
         return new BufferedReader(new InputStreamReader(is));
     }
@@ -331,31 +328,25 @@ class FileUtils {
     static String updateWordOfTheDayDate(Context context) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String date = dateFormat.format(Calendar.getInstance().getTime());
-        String lastWordDayDate = context.getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDayDate, null);
+        String lastWordDayDate = context.getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_DAYDATE, null);
         if (lastWordDayDate == null || !lastWordDayDate.equalsIgnoreCase(date)) {
             return date;
         }
         return null;
     }
 
-    static String getDay() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(Calendar.getInstance().getTime());
-        return date;
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeWordFromSavedList(File filesDir, Context context, String wordToRemove) {
         FileUtils.removeFromFile(filesDir, wordToRemove);
         SharedPrefUtils.removeWordFromSharedPref(wordToRemove, context);
-        DisplayUtils.displayToast(context, Globals.wordUnsaved);
+        DisplayUtils.displayToast(context, Globals.WORD_UNSAVED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void addWordToSavedList(File filesDir, String wordToSave, Context context, List<String> definitions) {
         FileUtils.writeToFile(filesDir, wordToSave);
         SharedPrefUtils.addWordToSharedPref(wordToSave, context, definitions);
-        DisplayUtils.displayToast(context, Globals.wordSaved);
+        DisplayUtils.displayToast(context, Globals.WORD_SAVED);
     }
 
 
@@ -374,19 +365,15 @@ class FileUtils {
     }
 
     public static boolean needsNotification(Context context, String day) {
-        if (SharedPrefUtils.getLastNotificationDate(context).equals(day)){
-            return false;
-        }
-        return true;
+        return !SharedPrefUtils.getLastNotificationDate(context).equals(day);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static ArrayList<SpannableString> generateGameWords(InputStream dicoWords) {
         ArrayList<SpannableString> gameWords = new ArrayList<>();
         Integer size = Globals.getGameWords(dicoWords).size();
-        for (int i=0; i<Globals.gameWordsNumber; i++){
-            Random random  = new Random();
-            int randomIndex = random.nextInt(size);
+        for (int i = 0; i<Globals.GAME_WORDS_NUMBER; i++){
+            int randomIndex = rand.nextInt(size);
             gameWords.add(new SpannableString(Globals.getGameWords(dicoWords).get(randomIndex)));
         }
         Globals.setGameWordsSelection(gameWords);

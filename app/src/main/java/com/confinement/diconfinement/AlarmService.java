@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class AlarmService {
     private Context context;
     private PendingIntent mAlarmSender;
-    private long alarmRepeatDelay = 60*1000*60*24;
+    private long alarmRepeatDelay = 60L*1000*60*24;
     public AlarmService(Context context) {
         this.context = context;
         mAlarmSender = PendingIntent.getBroadcast(context, 0, new Intent(context, AlarmReceiver.class), 0);

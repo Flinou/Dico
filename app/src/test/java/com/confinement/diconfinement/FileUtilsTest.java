@@ -68,8 +68,6 @@ public class FileUtilsTest {
             String dicoWord = reader.readLine();
             try {
                 assertNotNull(DefinitionsFinder.getDefinitions(appContext.getResources(), dicoWord));
-            } catch (AssertionError err) {
-                fail("Word : " + dicoWord + "not found.");
             } catch (Exception e) {
                 fail("Word : " + dicoWord + "not found. Exception caught");
             }

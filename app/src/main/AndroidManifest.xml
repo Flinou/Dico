@@ -35,7 +35,8 @@
         <activity
             android:name="com.confinement.diconfinement.SearchResultsActivity"
             android:label="@string/def_act_label"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="false">
 
             <!-- This intent-filter identifies this activity as "searchable" -->
 

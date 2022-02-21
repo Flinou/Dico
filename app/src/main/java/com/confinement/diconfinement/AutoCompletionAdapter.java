@@ -15,10 +15,6 @@ public class AutoCompletionAdapter extends CursorAdapter {
             super(context, cursor, false);
         }
 
-        private TextView getText() {
-            return this.text;
-        }
-
         private void setText(TextView textView) {
             this.text = textView;
         }
@@ -26,7 +22,7 @@ public class AutoCompletionAdapter extends CursorAdapter {
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             if (cursor != null) {
-                text.setText(cursor.getString(cursor.getColumnIndex(Globals.columnSuggestion)));
+                text.setText(cursor.getString(cursor.getColumnIndex(Globals.COLUMN_SUGGESTION)));
             }
         }
 

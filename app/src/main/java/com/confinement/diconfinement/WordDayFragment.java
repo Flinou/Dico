@@ -1,10 +1,8 @@
 package com.confinement.diconfinement;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
@@ -37,7 +35,7 @@ public class WordDayFragment extends Fragment {
                 container, false);
         listView = view.findViewById(R.id.wordday_list);
         titleView = view.findViewById(R.id.textview_wordday);
-        String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
+        String wordOfTheDay = getContext().getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, null);
         setWordOfTheDay(wordOfTheDay);
         displayWordDefinition(wordOfTheDay);
         DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
@@ -48,7 +46,7 @@ public class WordDayFragment extends Fragment {
     public void onResume() {
         DisplayUtils.hideHelpMenu(getActivity());
         DisplayUtils.displayAddMenu(getActivity());
-        String wordOfTheDay = getContext().getSharedPreferences(Globals.preferenceFile, Context.MODE_PRIVATE).getString(Globals.wordOfTheDay, null);
+        String wordOfTheDay = getContext().getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, null);
         displayWordDefinition(wordOfTheDay);
         DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
         super.onResume();
@@ -64,7 +62,7 @@ public class WordDayFragment extends Fragment {
         SpannableString dayWordSpan = new SpannableString(wordOfTheDay);
         dayWordSpan.setSpan(new RelativeSizeSpan(1f), 0,dayWordSpan.length(), 0);
         SpannableString defSpan = new SpannableString("");
-        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(SharedPrefUtils.getSharedPrefDefinition(getContext(), Globals.wordOfTheDayDefinition));
+        List<SpannableString> definitionSpan = DisplayUtils.createSpannableFromString(SharedPrefUtils.getSharedPrefDefinition(getContext(), Globals.WORD_DAY_DEF));
         for (SpannableString definitionPart : definitionSpan) {
             defSpan = new SpannableString(TextUtils.concat(defSpan, definitionPart));
         }

@@ -1,6 +1,7 @@
 package com.confinement.diconfinement;
 
 import android.content.Intent;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -16,10 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Random;
 
 public class GameWordsFragment extends Fragment {
     ListView listView = null;
@@ -45,22 +42,15 @@ public class GameWordsFragment extends Fragment {
         } else {
             listView.setAdapter(new GameWordsAdapter(getActivity(), Globals.gameWordsSelection));
         }
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object obj = listView.getItemAtPosition(position);
-                SpannableString savedWord = (SpannableString) obj;
-                if (savedWord != null) {
-                    Intent intent = FileUtils.createSearchIntent(savedWord, position);
-                    startActivity(intent);
-                }
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            Object obj = listView.getItemAtPosition(position);
+            SpannableString savedWord = (SpannableString) obj;
+            if (savedWord != null) {
+                Intent intent = FileUtils.createSearchIntent(savedWord, position);
+                startActivity(intent);
             }
         });
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
-            }
-        });
+        button.setOnClickListener(v -> listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico)))));
         super.onViewCreated(view, savedInstanceState);
 
     }

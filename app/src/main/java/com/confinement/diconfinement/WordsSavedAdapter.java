@@ -46,7 +46,7 @@ public class WordsSavedAdapter extends ArrayAdapter<SpannableString> {
                 SharedPrefUtils.removeWordFromSharedPref(wordToRemove, getContext());
                 objects.remove(objects.get(position));
                 wsa.notifyDataSetChanged();
-                DisplayUtils.displayToast(context, Globals.wordUnsaved);
+                DisplayUtils.displayToast(context, Globals.WORD_UNSAVED);
             }
         });
 
