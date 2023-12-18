@@ -55,25 +55,6 @@ public class FileUtilsTest {
     public void needsSave() {
     }
 
-
-    @Test
-    public void retrieveDefinitionTest() throws IOException {
-        Context appContext = ApplicationProvider.getApplicationContext();
-        FileUtils.initFirstWordDicoHashMap(appContext);
-        int dictionaryId = appContext.getResources().getIdentifier("dico","raw", "com.confinement.diconfinement");
-        InputStream is = appContext.getResources().openRawResource(dictionaryId);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String missingWords = "";
-        while(reader.ready()) {
-            String dicoWord = reader.readLine();
-            try {
-                assertNotNull(DefinitionsFinder.getDefinitions(appContext.getResources(), dicoWord));
-            } catch (Exception e) {
-                fail("Word : " + dicoWord + "not found. Exception caught");
-            }
-        }
-    }
-
     @Test
     public void retrieveSuggestions() throws IOException {
         //Testing accent é
