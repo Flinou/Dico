@@ -8,6 +8,7 @@ import android.text.SpannableString;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,8 +19,12 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class GameWordsFragment extends Fragment {
     ListView listView = null;
+    static Logger logger = Logger.getLogger(FileUtils.class.getName());
     public GameWordsFragment() {
         super(R.layout.gamewords_list);
     }
@@ -59,7 +64,6 @@ public class GameWordsFragment extends Fragment {
     @Override
     public void onResume() {
         FragmentActivity activity = getActivity();
-        listView = activity.findViewById(R.id.gamewords_list);
         if (Globals.gameWordsSelection == null) {
             listView.setAdapter(new GameWordsAdapter(activity, FileUtils.generateGameWords(activity.getResources().openRawResource(R.raw.dico))));
         } else {

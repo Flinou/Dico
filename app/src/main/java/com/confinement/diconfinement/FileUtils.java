@@ -50,27 +50,10 @@ class FileUtils {
     }
     //Those words are the first of each words files. Used to know in which words file user query must be seeked.
     static Logger logger = Logger.getLogger(FileUtils.class.getName());
-    static final String WORDATTRIBUTE = "val";
     private static LinkedHashMap<String, Integer> wordDicoHashMap = new LinkedHashMap<>();
     private static SecureRandom rand = new SecureRandom();
 
 
-    static Integer filetoSearch(String query) {
-        final Collator instance = Collator.getInstance(Locale.FRENCH);
-        instance.setStrength(Collator.SECONDARY);
-        instance.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-        List<String> wordDicoKeys = new ArrayList<>(wordDicoHashMap.keySet());
-        //Reverse wordDicoKeys because it's simpler to compare user query browsing dictionary from the end to the beginning
-        Collections.reverse(wordDicoKeys);
-        if (query != null) {
-            for (String firstDef : wordDicoKeys) {
-                if (instance.compare(query, firstDef) >= 0) {
-                    return wordDicoHashMap.get(firstDef);
-                }
-            }
-        }
-        return null;
-    }
 
     static void writeToFile(File filePath, String wordToAdd) {
         File file = new File(filePath, Globals.SAVED_WORDS_FILE_NAME);
@@ -269,38 +252,6 @@ class FileUtils {
             }
         }
         return savedWordsList;
-    }
-
-    static void initFirstWordDicoHashMap(Context applicationContext) {
-        final String dicoIdentifierPattern = "dico";
-        //Way to retrieve number of dictionary files in raw folder
-        int dictionNumbers= R.raw.class.getFields().length;
-
-        //length - 1 in loop because there is dico.txt file
-        for (int i=1; i<=dictionNumbers - 2; i++){
-            String dicoIdentifierString = dicoIdentifierPattern + i;
-
-            int dictionaryId = applicationContext.getResources().getIdentifier(dicoIdentifierString,"raw", Globals.PACKAGE_NAME);
-            InputStream is = applicationContext.getResources().openRawResource(dictionaryId);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-                String line = reader.readLine();
-                //We stop browsing dico at the first definition
-                while(!line.contains("definition")){
-                    line = reader.readLine();
-                }
-                //Regexp to retrieve first word of the definition. XML is like : "    <definition val="firstWord">"
-                Pattern p = Pattern.compile("\\s*<.* .*\"(.*)\">");
-                Matcher m = p.matcher(line);
-                String fileFirstWord = null;
-                if (m.matches()){
-                    fileFirstWord = m.group(1);
-                    wordDicoHashMap.put(fileFirstWord, dictionaryId);
-                }
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "needsSave : Unable to open dictionary words file");
-            }
-
-        }
     }
 
     static Intent createSearchIntent(SpannableString savedWord, int position) {

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -51,13 +50,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final View loadingLayout = findViewById(R.id.loadingLayout);
         TabLayout tabLayout = setUpTabLayout();
+
+
         new Thread(() -> {
             runOnUiThread(() -> DisplayUtils.displayLoadingImage(toolbar, loadingLayout, tabLayout));
             Context context1 = getApplicationContext();
-            FileUtils.initFirstWordDicoHashMap(context1);
             loadWordDayDefinition(context1);
             //Retrieve dicoWords for suggestions and game
             Globals.getDicoWords(context1.getResources().openRawResource(R.raw.dico));
+            DefinitionsDaoSingleton.getInstance(getApplicationContext());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         String wordOfTheDay = WordOfTheDayUtils.retrieveCurrentWordOfTheDay(appContext);
         if (!wordOfTheDay.equalsIgnoreCase(oldWordOfTheDay)) {
             SharedPrefUtils.putWordOfTheDay(appContext, wordOfTheDay);
-            SharedPrefUtils.putWordOfTheDayDefinition(appContext, DefinitionsFinder.getDefinitions(getResources(), wordOfTheDay));
+            SharedPrefUtils.putWordOfTheDayDefinition(appContext, DefinitionsFinder.getDefinitions(wordOfTheDay, DefinitionsDaoSingleton.getInstance(getApplicationContext())));
         }
     }
 

@@ -19,6 +19,7 @@ public class Globals extends AppCompatActivity {
     static final String ALARM = "alarm";
     static final String LAST_NOTIFICATION_DATE = "lastNotificationDate";
     static final String CHANNEL_ID = "channel_id";
+    static final String FIRST_SQL = "sorcellerie";
     static final String CHANNEL_DESCRIPTION = "Channel for new word of the day notification";
     static final CharSequence NOTIFICATION_TITLE = "Allez viens, on est bien !";
     static final CharSequence CHANNEL_NAME = "Notif channel";
@@ -31,11 +32,6 @@ public class Globals extends AppCompatActivity {
     static final String WORD_SAVED = "Mot sauvegardé dans votre liste";
     static final String WORD_UNSAVED = "Mot retiré de votre liste";
     static final String USER_QUERY_NOT_IN_DICT = "Ce mot n'appartient pas au dictionnaire.";
-    static final String DEF_XML = "def";
-    static final String DEFINITION_XML = "definition";
-    static final String TYPE_XML = "type";
-    static final String SYN_XML = "syn";
-    static final String NATURE_XML = "nature";
     static final String COLUMN_SUGGESTION = "wordSuggestion";
     static final String WORD_OF_THE_DAY_TITLE = "MDJ";
     static final String WORD_OF_THE_DAY_TITLE_FRAGMENT = "Mot du jour";

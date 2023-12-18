@@ -146,7 +146,8 @@ public class SearchResultsActivity extends AppCompatActivity {
     ArrayList<String> handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String userQuery = intent.getStringExtra(SearchManager.QUERY);
-            ArrayList<String> definToDisplay = (ArrayList<String>) DefinitionsFinder.getDefinitions(getResources(),userQuery);
+            DefinitionsDao defDAO = DefinitionsDaoSingleton.getInstance(getApplicationContext());
+            ArrayList<String> definToDisplay = (ArrayList<String>) DefinitionsFinder.getDefinitions(userQuery, defDAO);
             if (definToDisplay != null) return definToDisplay;
         }
         ArrayList<String> definToDisplay = new ArrayList<>();
@@ -167,7 +168,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             setTitle(searchedWord);
             setSearchedWord(searchedWord);
         }
-        //Check if word is not already stored in shared preferences. If not search in dictionnnary.
+        //Check if word is not already stored in shared preferences. If not search in dictionary.
         ArrayList<String> definition = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), FileUtils.normalizeString(searchedWord));
         if (definition == null) {
             definition = handleIntent(getIntent());
