@@ -20,6 +20,7 @@ public class Globals extends AppCompatActivity {
     static final String LAST_NOTIFICATION_DATE = "lastNotificationDate";
     static final String CHANNEL_ID = "channel_id";
     static final String FIRST_SQL = "sorcellerie";
+    static final String POSITION = "position";
     static final String CHANNEL_DESCRIPTION = "Channel for new word of the day notification";
     static final CharSequence NOTIFICATION_TITLE = "Allez viens, on est bien !";
     static final CharSequence CHANNEL_NAME = "Notif channel";
@@ -41,6 +42,7 @@ public class Globals extends AppCompatActivity {
     static final String GAME_NAME = "Le jeu du Diconfinement";
     static final String GAME_EXPLANATIONS = "5 mots ?\nVous en choisissez un.\nVos amis doivent ensuite en deviner le sens ou en faire la définition la plus drôle possible.\nVous choisissez l'heureux vainqueur qui prendra votre rôle au tour suivant.\nEffectivement, c'est pas fou comme jeu mais on manquait de budget." ;
     static final String SAVED_WORDS_FILE_NAME = "savedWords";
+    static final String TEMP_FILE = "tempFile";
     static final String WORD_OF_THE_DAY_FILE_NAME = "dayword";
     static final String PACKAGE_NAME = "com.confinement.diconfinement";
     static List<SpannableString> gameWordsSelection = null;

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.Normalizer;
@@ -30,17 +29,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import android.icu.text.Collator;
+
 import org.apache.commons.lang3.StringUtils;
 
 class FileUtils {
@@ -55,8 +50,8 @@ class FileUtils {
 
 
 
-    static void writeToFile(File filePath, String wordToAdd) {
-        File file = new File(filePath, Globals.SAVED_WORDS_FILE_NAME);
+    static void addToFile(File filePath, String wordToAdd, String fileName) {
+        File file = new File(filePath, fileName);
         try (FileWriter writer = new FileWriter(file, true)) {
             writer.append(wordToAdd).append('\n');
         } catch (IOException e) {
@@ -179,12 +174,31 @@ class FileUtils {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static void removeFromFile(File filePath, String wordToRemove) {
+    static void removeFromFile(File filePath, String wordToRemove, String fileName) {
 
-        File savedWordsFile = new File(filePath, Globals.SAVED_WORDS_FILE_NAME);
-        String tempFileName = "tempfile";
+        File savedWordsFile = new File(filePath, fileName);
+        String tempFileName = Globals.TEMP_FILE;
         File tempFile = new File(filePath, tempFileName);
 
+        copyWithoutWord(wordToRemove, savedWordsFile, tempFile);
+        deleteOldFile(savedWordsFile);
+        renameNewFile(savedWordsFile, tempFile);
+
+    }
+
+    static void renameNewFile(File savedWordsFile, File tempFile) {
+        if (!tempFile.renameTo(savedWordsFile)){
+            logger.log(Level.WARNING, "removeFromFile - Unable to rename saved words file");
+        }
+    }
+
+    static void deleteOldFile(File savedWordsFile) {
+        if (!savedWordsFile.delete()) {
+            logger.log(Level.WARNING, "removeFromFile - Unable to delete saved words file");
+        }
+    }
+
+    static void copyWithoutWord(String wordToRemove, File savedWordsFile, File tempFile) {
         try (BufferedReader reader = new BufferedReader(new FileReader(savedWordsFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             String line;
@@ -197,14 +211,6 @@ class FileUtils {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Unable to remove word :" + wordToRemove + " from saved words file");
         }
-
-        if (!savedWordsFile.delete()) {
-            logger.log(Level.WARNING, "removeFromFile - Unable to delete saved words file");
-        }
-
-        if (!tempFile.renameTo(savedWordsFile)){
-            logger.log(Level.WARNING, "removeFromFile - Unable to rename saved words file");
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -215,7 +221,7 @@ class FileUtils {
         try {
             savedWordsInptStrm = context.openFileInput(Globals.SAVED_WORDS_FILE_NAME);
         } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "needsSave : Unable to find saved words file");
+            logger.log(Level.WARNING, "retrieveSavedWords : Unable to find saved words file");
             return savedWordsString;
         }
 
@@ -224,7 +230,7 @@ class FileUtils {
         try (BufferedReader savedWordsReader = new BufferedReader(savedWrdsInptStrmRdr)) {
             readSavedWordsList(savedWordsString, savedWordsReader);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "needsSave : Unable to read saved words file");
+            logger.log(Level.WARNING, "retrieveSavedWords : Unable to read saved words file");
         }
 
         return savedWordsString;
@@ -259,7 +265,7 @@ class FileUtils {
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra(SearchManager.QUERY,savedWord.toString());
         intent.setComponent(new ComponentName(Globals.PACKAGE_NAME, Globals.PACKAGE_NAME + ".SearchResultsActivity"));
-        intent.putExtra("position", position);
+        intent.putExtra(Globals.POSITION, position);
         return intent;
     }
 
@@ -288,14 +294,14 @@ class FileUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeWordFromSavedList(File filesDir, Context context, String wordToRemove) {
-        FileUtils.removeFromFile(filesDir, wordToRemove);
+        FileUtils.removeFromFile(filesDir, wordToRemove, Globals.SAVED_WORDS_FILE_NAME);
         SharedPrefUtils.removeWordFromSharedPref(wordToRemove, context);
         DisplayUtils.displayToast(context, Globals.WORD_UNSAVED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void addWordToSavedList(File filesDir, String wordToSave, Context context, List<String> definitions) {
-        FileUtils.writeToFile(filesDir, wordToSave);
+        FileUtils.addToFile(filesDir, wordToSave, Globals.SAVED_WORDS_FILE_NAME);
         SharedPrefUtils.addWordToSharedPref(wordToSave, context, definitions);
         DisplayUtils.displayToast(context, Globals.WORD_SAVED);
     }
