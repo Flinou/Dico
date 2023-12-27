@@ -22,7 +22,8 @@
             android:name="com.confinement.diconfinement.MainActivity"
             android:label="@string/main_act_label"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

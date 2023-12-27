@@ -13,13 +13,14 @@ android {
     defaultConfig {
         applicationId "com.confinement.diconfinement"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 16
         versionName "8.0"
     }
 
     testOptions {
         unitTests.includeAndroidResources = true
+
     }
     buildTypes {
         release {
@@ -33,7 +34,6 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
-
 
 dependencies {
     def room_version = "2.5.0"

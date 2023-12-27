@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadWordDayDefinition(Context appContext) {
         String oldWordOfTheDay = appContext.getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, "");
-        String wordOfTheDay = WordOfTheDayUtils.retrieveCurrentWordOfTheDay(appContext);
+        String wordOfTheDay = WordOfTheDayUtils.retrieveWordOfTheDay(appContext);
         if (!wordOfTheDay.equalsIgnoreCase(oldWordOfTheDay)) {
             SharedPrefUtils.putWordOfTheDay(appContext, wordOfTheDay);
             SharedPrefUtils.putWordOfTheDayDefinition(appContext, DefinitionsFinder.getDefinitions(wordOfTheDay, DefinitionsDaoSingleton.getInstance(getApplicationContext())));
@@ -203,25 +203,24 @@ public class MainActivity extends AppCompatActivity {
         DisplayUtils.hideHelpMenu(this);
         DisplayUtils.hideAddMenu(this);
         toolbar.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.help_game: {
-                    new AlertDialog.Builder(MainActivity.this)
-                            .setTitle(Globals.GAME_NAME)
-                            .setMessage(Globals.GAME_EXPLANATIONS)
-                            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            })
-                            .setIcon(android.R.drawable.ic_menu_help)
-                            .show();
-                    return true;
-                } case R.id.add_word: {
-                    String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY_TITLE, Globals.WORD_OF_THE_DAY_DEFAULT);
-                    List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.WORD_DAY_DEF);
-                    FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword, null));
-                    return true;
-                } default: {
-                    return false;
-            }
-        }});
+                    if (item.getItemId() == R.id.help_game) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(Globals.GAME_NAME)
+                                .setMessage(Globals.GAME_EXPLANATIONS)
+                                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                                })
+                                .setIcon(android.R.drawable.ic_menu_help)
+                                .show();
+                        return true;
+                    } else if (item.getItemId() == R.id.add_word) {
+                        String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY_TITLE, Globals.WORD_OF_THE_DAY_DEFAULT);
+                        List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.WORD_DAY_DEF);
+                        FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword, null));
+                        return true;
+                    } else {
+                        return false;
+                    }
+        });
         return true;
     }
 }
