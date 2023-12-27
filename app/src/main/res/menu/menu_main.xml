@@ -3,10 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.confinement.diconfinement.MainActivity">
 
-    <item android:id="@+id/search"
-        android:icon="@drawable/ic_search"
-        android:title="search"
-        app:actionViewClass="android.widget.SearchView"
+
+
+    <item android:id="@+id/add_word"
+        android:icon="@drawable/ic_addword"
+        android:title="addWord"
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/help_game"
@@ -14,10 +15,10 @@
         android:title="help"
         app:showAsAction="ifRoom" />
 
-
-    <item android:id="@+id/add_word"
-        android:icon="@drawable/ic_addword"
-        android:title="addWord"
+    <item android:id="@+id/search"
+        android:icon="@drawable/ic_search"
+        android:title="search"
+        app:actionViewClass="android.widget.SearchView"
         app:showAsAction="ifRoom" />
 
     <!-- WARNING collapseAsAction triggers weird search behaviours" -->

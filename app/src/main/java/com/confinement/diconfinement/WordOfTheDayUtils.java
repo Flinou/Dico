@@ -37,7 +37,7 @@ public class WordOfTheDayUtils {
         int newWordDayIndex = sharedPref.getInt(Globals.WORD_DAY_INDEX, -1) + 1;
         SharedPrefUtils.updateWordOfTheDayIndexInSharedPref(newWordDayIndex, context);
         BufferedReader wordOfTheDayReader = FileUtils.openRawFile(Globals.WORD_OF_THE_DAY_FILE_NAME, context);
-        SharedPrefUtils.updateWordDayInShrdPref(newWordDayIndex, context, sharedPref, wordOfTheDayReader);
+        SharedPrefUtils.updateWordDayInShrdPref(newWordDayIndex, sharedPref, wordOfTheDayReader);
         return sharedPref.getString(Globals.WORD_OF_THE_DAY_TITLE, null);
     }
 }

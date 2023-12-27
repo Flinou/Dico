@@ -15,13 +15,16 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
@@ -34,10 +37,23 @@ public class SharedPrefUtilsTest extends TestCase {
     String wordTofind = "voiture";
     String wordToSave = "maison";
     SharedPreferences sharedPref = null;
-
     String wordDayTestFileName = null;
     InputStream is = null;
+    private Path resDir;
+    private File testWordDayFile;
+    private String wordDayFileName = "testDayWord";
+    BufferedReader wordDayReader = null;
+    int indexWordDay = 3;
+    private String wordDay = "attentif";
+    private Date date = null;
 
+    private String wordDays = "Refrain\n" +
+            "doctoralement\n" +
+            "multi-certification\n" +
+            "attentif\n" +
+            "clavicorne\n" +
+            "testWordToRemove\n" +
+            "hermaphrodite\n";
     @Before
     public void initResources() throws IOException {
         context = ApplicationProvider.getApplicationContext();
@@ -55,11 +71,13 @@ public class SharedPrefUtilsTest extends TestCase {
         String json = gson.toJson(wordToFindDef);
         editor.putString(wordTofind, json);
         editor.commit();
-        String[] wordDays = {"Maison","Voiture","Vérité","Méchant","Test"};
-        wordDayTestFileName = getClass().getResource("/dayword").getPath();
-        is = this.getClass().getClassLoader().getResourceAsStream(wordDayTestFileName);
-        ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(wordDayTestFileName));
-        outputStream.writeObject(wordDays);
+        resDir = Paths.get("src","test","resources");
+        testWordDayFile = Paths.get("src","test","resources", wordDayFileName).toFile();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(testWordDayFile));
+        wordDayReader = new BufferedReader(new FileReader(testWordDayFile));
+        writer.write(wordDays);
+        writer.close();
+        date = new Date();
     }
 
     @Test
@@ -102,13 +120,19 @@ public class SharedPrefUtilsTest extends TestCase {
 
     @Test
     public void testUpdateWordDayInShrdPref() {
-        //TODO
-        assertTrue(true);
+        SharedPrefUtils.updateWordDayInShrdPref(indexWordDay, sharedPref, wordDayReader);
+        assertTrue("Wrong update of wordDay", sharedPref.getString(Globals.WORD_OF_THE_DAY_TITLE, null).equalsIgnoreCase(wordDay));
     }
 
+    @Test
     public void testUpdateWordOfTheDayDateInSharedPref() {
+        SharedPrefUtils.updateWordOfTheDayDateInSharedPref(String.valueOf(date), context);
+        assertTrue("Wrong update of wordDay date", sharedPref.getString(Globals.WORD_DAYDATE, null).equalsIgnoreCase(String.valueOf(date)));
     }
 
+    @Test
     public void testUpdateWordOfTheDayIndexInSharedPref() {
+        SharedPrefUtils.updateWordOfTheDayIndexInSharedPref(indexWordDay, context);
+        assertEquals("Wrong update of wordDay index", sharedPref.getInt(Globals.WORD_DAY_INDEX, 0), indexWordDay);
     }
 }

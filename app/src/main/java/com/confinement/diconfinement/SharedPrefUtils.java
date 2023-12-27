@@ -62,7 +62,7 @@ public class SharedPrefUtils {
         editor.putString(Globals.WORD_OF_THE_DAY, wordOfTheDay);
         editor.commit();
     }
-    static void updateWordDayInShrdPref(int index, Context context, SharedPreferences sharedPref, BufferedReader wordOfDayReader) {
+    static void updateWordDayInShrdPref(int index, SharedPreferences sharedPref, BufferedReader wordOfDayReader) {
         SharedPreferences.Editor editor = sharedPref.edit();
         String newWordOfTheDay = "";
         try (wordOfDayReader){
