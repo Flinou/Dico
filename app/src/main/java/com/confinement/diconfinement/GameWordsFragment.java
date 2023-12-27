@@ -64,9 +64,12 @@ public class GameWordsFragment extends Fragment {
     @Override
     public void onResume() {
         FragmentActivity activity = getActivity();
-        if (Globals.gameWordsSelection == null) {
+        if (listView == null && getView() != null) {
+            listView = getView().findViewById(R.id.gamewords_list);;
+        }
+        if (Globals.gameWordsSelection == null && listView != null) {
             listView.setAdapter(new GameWordsAdapter(activity, FileUtils.generateGameWords(activity.getResources().openRawResource(R.raw.dico))));
-        } else {
+        } else if (listView != null){
             listView.setAdapter(new GameWordsAdapter(activity, Globals.gameWordsSelection));
         }
         DisplayUtils.displayHelpMenu(activity);
