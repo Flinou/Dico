@@ -62,15 +62,12 @@ public class SharedPrefUtils {
         editor.putString(Globals.WORD_OF_THE_DAY, wordOfTheDay);
         editor.commit();
     }
-    static String updateWordOfTheDayInSharedPref(int index, Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        String newWordOfTheDay = null;
-        try (BufferedReader wordOfTheDayReader = FileUtils.openRawFile(Globals.WORD_OF_THE_DAY_FILE_NAME, context)){
-            newWordOfTheDay = wordOfTheDayReader.readLine();
+    static void updateWordDayInShrdPref(int index, Context context, SharedPreferences sharedPref, BufferedReader wordOfDayReader) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String newWordOfTheDay = "";
+        try (wordOfDayReader){
             int cpt = 0;
-            while (newWordOfTheDay != null && cpt < index) {
-                newWordOfTheDay = wordOfTheDayReader.readLine();
+            while ((newWordOfTheDay = wordOfDayReader.readLine()) != null && cpt < index) {
                 cpt ++;
             }
         } catch (IOException e) {
@@ -78,8 +75,7 @@ public class SharedPrefUtils {
         }
         editor.putString(Globals.WORD_OF_THE_DAY_TITLE, newWordOfTheDay);
         editor.commit();
-        return newWordOfTheDay;
-    }
+     }
 
 
     static void updateWordOfTheDayDateInSharedPref(String wordDayDate, Context context) {

@@ -28,7 +28,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentMainAct, 0);
         NotificationManager notifManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Notification notif;
-        String wordOfTheDay = WordOfTheDayUtils.retrieveCurrentWordOfTheDay(context.getApplicationContext());
+        String wordOfTheDay = WordOfTheDayUtils.retrieveWordOfTheDay(context.getApplicationContext());
         Spannable notifContent = generateNotifContent(context, wordOfTheDay);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setChannelForNotif(notifManager);

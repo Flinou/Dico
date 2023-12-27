@@ -22,25 +22,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.SecureRandom;
-import java.text.DateFormat;
 import java.text.Normalizer;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import android.icu.text.Collator;
+
 import org.apache.commons.lang3.StringUtils;
 
 class FileUtils {
@@ -276,15 +268,6 @@ class FileUtils {
         return new BufferedReader(new InputStreamReader(is));
     }
 
-    static String updateWordOfTheDayDate(Context context) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(Calendar.getInstance().getTime());
-        String lastWordDayDate = context.getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_DAYDATE, null);
-        if (lastWordDayDate == null || !lastWordDayDate.equalsIgnoreCase(date)) {
-            return date;
-        }
-        return null;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     static void removeWordFromSavedList(File filesDir, Context context, String wordToRemove) {
