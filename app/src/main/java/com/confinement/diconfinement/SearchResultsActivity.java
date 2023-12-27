@@ -115,25 +115,21 @@ public class SearchResultsActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
-        switch (item.getItemId())  {
-            case android.R.id.home :
-                startActivity(new Intent(SearchResultsActivity.this, MainActivity.class));
-                finish(); // close this activity and return to preview activity (if there is any)
-                break;
-            case R.id.action_save :
-                FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
-                if (getNeedsSave()) {
-                    setNeedsSave(false);
-                } else {
-                    setNeedsSave(true);
-                }
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(SearchResultsActivity.this, MainActivity.class));
+            finish(); // close this activity and return to preview activity (if there is any)
+        } else if (item.getItemId() == R.id.action_save) {
+            FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
+            if (getNeedsSave()) {
+                setNeedsSave(false);
+            } else {
+                setNeedsSave(true);
             }
+        }
         return super.onOptionsItemSelected(item);
     }
 
