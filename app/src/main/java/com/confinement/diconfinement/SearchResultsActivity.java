@@ -176,7 +176,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_back_arrow);
+            toolbar.setNavigationIcon(R.drawable.ic_back);
             setSupportActionBar(toolbar);
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
