@@ -40,8 +40,6 @@ public class GameWordsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         listView = view.findViewById(R.id.gamewords_list);
         Button button = view.findViewById(R.id.tirage_button);
-        DisplayUtils.displayHelpMenu(getActivity());
-        DisplayUtils.hideAddMenu(getActivity());
         if (Globals.gameWordsSelection == null) {
             listView.setAdapter(new GameWordsAdapter(getActivity(), FileUtils.generateGameWords(getActivity().getResources().openRawResource(R.raw.dico))));
         } else {
@@ -63,6 +61,8 @@ public class GameWordsFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onResume() {
+        DisplayUtils.displayHelpMenu(getActivity());
+        DisplayUtils.hideAddMenu(getActivity());
         FragmentActivity activity = getActivity();
         if (listView == null && getView() != null) {
             listView = getView().findViewById(R.id.gamewords_list);;
