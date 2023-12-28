@@ -87,24 +87,24 @@ public class DisplayUtils {
 
     static void hideAddMenu(FragmentActivity activity) {
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
-            toolbar.getMenu().findItem(R.id.add_word).setVisible(false);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.addWord) != null) {
+            toolbar.getMenu().findItem(R.id.addWord).setVisible(false);
         }
     }
 
     static void displayAddMenu(FragmentActivity activity) {
         Toolbar toolbar = activity.findViewById(R.id.toolbar);
 
-        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.add_word) != null) {
-            toolbar.getMenu().findItem(R.id.add_word).setVisible(true);
+        if (toolbar != null && toolbar.getMenu() != null && toolbar.getMenu().findItem(R.id.addWord) != null) {
+            toolbar.getMenu().findItem(R.id.addWord).setVisible(true);
         }
     }
 
     static void setIconAlpha(boolean needsSave, Drawable icon) {
         if (needsSave) {
-            icon.setAlpha(255);
+            icon.mutate().setAlpha(255);
         } else {
-            icon.setAlpha(50);
+            icon.mutate().setAlpha(50);
         }
     }
 

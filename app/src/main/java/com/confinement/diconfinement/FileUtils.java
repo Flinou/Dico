@@ -296,16 +296,16 @@ class FileUtils {
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    static void handleSaveClick(String wordToSave, List<String> wordOfTheDayDef, Context context, Drawable icon) {
+    static void handleSaveClick(String wordToSave, List<String> wordOfTheDayDef, Context context, Drawable saveIcon) {
         File filesDir = context.getFilesDir();
         if (FileUtils.needsSave(context, wordToSave)) {
             if (filesDir != null && wordToSave != null) {
                 FileUtils.addWordToSavedList(filesDir, wordToSave, context, wordOfTheDayDef);
-                DisplayUtils.setIconAlpha(false, icon);
+                DisplayUtils.setIconAlpha(false, saveIcon);
             }
         } else {
             FileUtils.removeWordFromSavedList(filesDir, context, wordToSave);
-            DisplayUtils.setIconAlpha(true, icon);
+            DisplayUtils.setIconAlpha(true, saveIcon);
         }
     }
 

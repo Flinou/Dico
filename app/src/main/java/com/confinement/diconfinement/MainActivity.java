@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
 public class MainActivity extends AppCompatActivity {
     private Menu menu;
     static Logger logger = Logger.getLogger(MainActivity.class.getName());
-
+    Drawable saveIcon;
     public Menu getMenu() {
         return menu;
     }
@@ -39,9 +40,11 @@ public class MainActivity extends AppCompatActivity {
         this.menu = menu;
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         Context context = getApplicationContext();
         setAlarmIfNeeded(context);
         super.onCreate(savedInstanceState);
@@ -169,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        setSaveIcon(menu.findItem(R.id.addWord).getIcon());
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
 
@@ -212,15 +216,19 @@ public class MainActivity extends AppCompatActivity {
                                 .setIcon(android.R.drawable.ic_menu_help)
                                 .show();
                         return true;
-                    } else if (item.getItemId() == R.id.add_word) {
+                    } else if (item.getItemId() == R.id.addWord) {
                         String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY_TITLE, Globals.WORD_OF_THE_DAY_DEFAULT);
                         List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.WORD_DAY_DEF);
-                        FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword, null));
+                        FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), this.saveIcon);
                         return true;
                     } else {
                         return false;
                     }
         });
         return true;
+    }
+
+    private void setSaveIcon(Drawable icon) {
+        this.saveIcon = icon;
     }
 }

@@ -5,6 +5,7 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -26,27 +27,22 @@ public class SearchResultsActivity extends AppCompatActivity {
     private boolean needsSave;
     private Menu menu;
     private List<String> definitions;
-
+    private Drawable saveIcon;
     public List<String> getDefinitions() {
         return definitions;
     }
-
     public void setDefinitions(List<String> definitions) {
         this.definitions = definitions;
     }
-
     public Menu getMenu() {
         return menu;
     }
-
     public void setMenu(Menu menu) {
         this.menu = menu;
     }
-
     private String getSearchedWord() {
         return this.searchedWord;
     }
-
     private void setSearchedWord(String word) {
         this.searchedWord = word;
     }
@@ -66,6 +62,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         setNeedsSave(FileUtils.needsSave(getApplicationContext(), getSearchedWord()));
         setMenu(menu);
+        setSaveIcon(menu.findItem(R.id.action_save).getIcon());
 
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -108,10 +105,17 @@ public class SearchResultsActivity extends AppCompatActivity {
         return true;
     }
 
+    private void setSaveIcon(Drawable icon) {
+        this.saveIcon = icon;
+    }
+    public Drawable getSaveIcon() {
+        return saveIcon;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getApplicationContext(), getSearchedWord()), getResources().getDrawable(R.drawable.ic_addword, null));
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getApplicationContext(), getSearchedWord()), getSaveIcon());
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -123,7 +127,8 @@ public class SearchResultsActivity extends AppCompatActivity {
             startActivity(new Intent(SearchResultsActivity.this, MainActivity.class));
             finish(); // close this activity and return to preview activity (if there is any)
         } else if (item.getItemId() == R.id.action_save) {
-            FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), getApplicationContext(), getResources().getDrawable(R.drawable.ic_addword));
+            Context context = getApplicationContext();
+            FileUtils.handleSaveClick(getSearchedWord(), getDefinitions(), context, getSaveIcon());
             if (getNeedsSave()) {
                 setNeedsSave(false);
             } else {

@@ -1,12 +1,15 @@
 package com.confinement.diconfinement;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -21,10 +24,18 @@ public class WordDayFragment extends Fragment {
     ListView listView = null;
     TextView titleView = null;
     String wordOfTheDay = null;
-    public WordDayFragment() {super(R.layout.wordday_list);}
-
+    MainActivity mainAct = null;
     public void setWordOfTheDay(String wordOfTheDay) {
         this.wordOfTheDay = wordOfTheDay;
+    }
+    public WordDayFragment() {super(R.layout.wordday_list);}
+
+    public void setMainAct(){
+        this.mainAct = (MainActivity) getActivity();
+    }
+
+    public MainActivity getMainAct(){
+        return this.mainAct;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -38,7 +49,9 @@ public class WordDayFragment extends Fragment {
         String wordOfTheDay = getContext().getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, null);
         setWordOfTheDay(wordOfTheDay);
         displayWordDefinition(wordOfTheDay);
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
+        setMainAct();
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getMainAct().saveIcon);
+
         return view;
     }
 
@@ -48,7 +61,7 @@ public class WordDayFragment extends Fragment {
         DisplayUtils.displayAddMenu(getActivity());
         String wordOfTheDay = getContext().getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, null);
         displayWordDefinition(wordOfTheDay);
-        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getResources().getDrawable(R.drawable.ic_addword));
+        DisplayUtils.setIconAlpha(FileUtils.needsSave(getContext(), wordOfTheDay), getMainAct().saveIcon);
         super.onResume();
     }
 
