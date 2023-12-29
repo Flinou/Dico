@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                                 .show();
                         return true;
                     } else if (item.getItemId() == R.id.addWord) {
-                        String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY_TITLE, Globals.WORD_OF_THE_DAY_DEFAULT);
+                        String wordToSave = getSharedPreferences(Globals.PREFERENCE_FILE, Context.MODE_PRIVATE).getString(Globals.WORD_OF_THE_DAY, Globals.WORD_OF_THE_DAY_DEFAULT);
                         List<String> wordOfTheDayDef = SharedPrefUtils.getSharedPrefDefinition(getApplicationContext(), Globals.WORD_DAY_DEF);
                         FileUtils.handleSaveClick(wordToSave, wordOfTheDayDef, getApplicationContext(), this.saveIcon);
                         return true;

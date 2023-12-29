@@ -34,7 +34,6 @@ public class Globals extends AppCompatActivity {
     static final String WORD_UNSAVED = "Mot retiré de votre liste";
     static final String USER_QUERY_NOT_IN_DICT = "Ce mot n'appartient pas au dictionnaire.";
     static final String COLUMN_SUGGESTION = "wordSuggestion";
-    static final String WORD_OF_THE_DAY_TITLE = "MDJ";
     static final String WORD_OF_THE_DAY_TITLE_FRAGMENT = "Mot du jour";
     static final String SAVED_WORDS_FRAGMENT = "Votre liste";
     static final String PREFERENCE_FILE = "preferenceFile";

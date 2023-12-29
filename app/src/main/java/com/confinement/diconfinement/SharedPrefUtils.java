@@ -73,7 +73,7 @@ public class SharedPrefUtils {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Unable to open wordOfTheDay file");
         }
-        editor.putString(Globals.WORD_OF_THE_DAY_TITLE, newWordOfTheDay);
+        editor.putString(Globals.WORD_OF_THE_DAY, newWordOfTheDay);
         editor.commit();
      }
 

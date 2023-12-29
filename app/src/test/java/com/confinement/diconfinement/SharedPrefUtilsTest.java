@@ -121,7 +121,7 @@ public class SharedPrefUtilsTest extends TestCase {
     @Test
     public void testUpdateWordDayInShrdPref() {
         SharedPrefUtils.updateWordDayInShrdPref(indexWordDay, sharedPref, wordDayReader);
-        assertTrue("Wrong update of wordDay", sharedPref.getString(Globals.WORD_OF_THE_DAY_TITLE, null).equalsIgnoreCase(wordDay));
+        assertTrue("Wrong update of wordDay", sharedPref.getString(Globals.WORD_OF_THE_DAY, null).equalsIgnoreCase(wordDay));
     }
 
     @Test
