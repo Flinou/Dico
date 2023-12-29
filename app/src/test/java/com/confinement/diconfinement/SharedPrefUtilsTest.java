@@ -68,7 +68,6 @@ public class SharedPrefUtilsTest extends TestCase {
         String json = gson.toJson(wordToFindDef);
         editor.putString(wordTofind, json);
         editor.commit();
-        resDir = Paths.get("src","test","resources");
         testWordDayFile = Paths.get("src","test","resources", wordDayFileName).toFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(testWordDayFile));
         wordDayReader = new BufferedReader(new FileReader(testWordDayFile));
