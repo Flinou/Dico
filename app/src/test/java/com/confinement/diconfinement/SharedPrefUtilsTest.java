@@ -37,9 +37,6 @@ public class SharedPrefUtilsTest extends TestCase {
     String wordTofind = "voiture";
     String wordToSave = "maison";
     SharedPreferences sharedPref = null;
-    String wordDayTestFileName = null;
-    InputStream is = null;
-    private Path resDir;
     private File testWordDayFile;
     private String wordDayFileName = "testDayWord";
     BufferedReader wordDayReader = null;
