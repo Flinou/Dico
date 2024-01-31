@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class AutoCompletion {
 
-    private static volatile AutoCompletion instance = null;
+    private static AutoCompletion instance = null;
     private AutoCompletion() {
         super();
     }

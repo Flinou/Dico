@@ -6,7 +6,7 @@ import androidx.room.Room;
 
 public class DefinitionsDaoSingleton {
     // private static instance variable to hold the singleton instance
-    private static volatile DefinitionsDao INSTANCE = null;
+    private static DefinitionsDao INSTANCE = null;
 
     // private constructor to prevent instantiation of the class
     private DefinitionsDaoSingleton() {}

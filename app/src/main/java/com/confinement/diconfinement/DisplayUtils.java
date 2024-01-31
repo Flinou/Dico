@@ -32,10 +32,10 @@ public class DisplayUtils {
     static CharSequence trimTrailingWhitespace(CharSequence source) {
         if(source == null)
             return "";
-        int i = source.length();
-        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        int i = source.length() - 1;
+        while(i >= 0 && Character.isWhitespace(source.charAt(i))) {
+            i--;
         }
-
         return source.subSequence(0, i+1);
     }
 
