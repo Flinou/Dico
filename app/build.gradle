@@ -14,8 +14,8 @@ android {
         applicationId "com.confinement.diconfinement"
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode 16
-        versionName "8.0"
+        versionCode 17
+        versionName "8.1"
     }
 
     testOptions {
